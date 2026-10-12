@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.impeccable/config.local.json
+
+# Local-only files
+.claude/settings.local.json
+.impeccable/hook.cache.json
+# The Impeccable program downloads itself on first run; no need to store 19 MB in git
+.claude/skills/impeccable/scripts/bin/

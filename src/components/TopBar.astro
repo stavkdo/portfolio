@@ -1,0 +1,26 @@
+---
+import { site, strings } from "../data/content";
+---
+
+<header class="bar">
+  <a class="bar__mark" href="#top" aria-label={`${site.firstName} ${site.lastName}, back to top`}>{site.firstName} {site.lastName}</a>
+  <nav class="bar__nav" aria-label="Sections">
+    {strings.map((s, i) => (
+      <a href={`#${s.id}`} data-string={i}><span class="bar__note">{s.note}</span>{s.label}</a>
+    ))}
+  </nav>
+  <button class="sound" type="button" aria-pressed="false">
+    <svg class="sound__icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"></path>
+      <path class="sound__wave" d="M15.5 9a4.2 4.2 0 0 1 0 6"></path>
+      <path class="sound__wave" d="M18 6.5a7.8 7.8 0 0 1 0 11"></path>
+      <path class="sound__mute" d="M16 9.5l5 5M21 9.5l-5 5"></path>
+    </svg>
+    <span class="sound__label">Sound off</span>
+  </button>
+</header>
+
+<script>
+  import "../scripts/sound";
+  import "../scripts/nav";
+</script>

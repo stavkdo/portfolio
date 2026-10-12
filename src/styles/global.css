@@ -1,0 +1,717 @@
+/* ------------------------------------------------------------------
+   Four Strings: tokens
+   An illuminated-manuscript palette: ultramarine, shell gold,
+   vermilion rubric, and the varnish of a cello's back.
+------------------------------------------------------------------ */
+:root {
+  --night:        oklch(0.17 0.045 268);
+  --lapis-deep:   oklch(0.22 0.085 268);
+  --lapis:        oklch(0.32 0.135 266);
+  --varnish:      oklch(0.32 0.085 38);
+  --varnish-deep: oklch(0.25 0.065 38);
+  --varnish-lit:  oklch(0.52 0.11 52);
+  --gold:         oklch(0.84 0.12 84);
+  --gold-deep:    oklch(0.72 0.12 78);
+  --vermilion:    oklch(0.72 0.16 40);
+  --vellum:       oklch(0.95 0.022 88);
+  --vellum-soft:  oklch(0.85 0.035 84);
+  --ink-on-gold:  oklch(0.24 0.08 268);
+
+  --display: "Eagle Lake", "Alegreya", serif;
+  --serif:   "Alegreya", Georgia, serif;
+  --caps:    "Alegreya SC", "Alegreya", serif;
+  --sans:    "Alegreya Sans", "Segoe UI", sans-serif;
+
+  --gutter: clamp(1rem, 5vw, 5rem);
+  /* how tall each colour hand-off between sections is, on each side of the edge */
+  --blend: clamp(5rem, 14vh, 9rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4.5rem;
+  /* A gentle hold: when you stop scrolling near a section (or a project), the page settles onto it.
+     Scroll with more force and you glide past. Change "proximity" to "mandatory" for a firm hold. */
+  scroll-snap-type: y proximity;
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--gold-deep) var(--night);
+  scrollbar-width: thin;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--lapis-deep);
+  color: var(--vellum);
+  font-family: var(--serif);
+  font-size: clamp(1.125rem, 0.4vw + 1rem, 1.3rem);
+  line-height: 1.6;
+  font-kerning: normal;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  caret-color: var(--gold);
+  overflow-x: hidden;
+}
+
+/* Paper grain over everything */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection { background: var(--gold); color: var(--ink-on-gold); }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--night); }
+::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 10px; border: 3px solid var(--night); }
+
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.22em; }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+svg { display: block; }
+
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.skip {
+  position: fixed; top: 0.75rem; left: 0.75rem; z-index: 200;
+  padding: 0.5rem 1rem; background: var(--gold); color: var(--ink-on-gold);
+  font-family: var(--sans); font-weight: 700; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip:focus { transform: none; }
+
+/* Drifting motes of light */
+.motes {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 1;
+}
+
+main { position: relative; }
+
+/* ------------------------------------------------------------------
+   Top bar
+------------------------------------------------------------------ */
+.bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; gap: 2rem;
+  padding: 0.85rem var(--gutter);
+  font-family: var(--sans);
+  transition: background-color 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+}
+.bar.is-solid {
+  background: color-mix(in oklch, var(--night) 92%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--gold) 18%, transparent);
+}
+
+.bar__mark {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.45rem;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--gold);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.bar.is-solid .bar__mark { opacity: 1; transform: none; }
+
+.bar__nav { display: flex; gap: clamp(1rem, 2.4vw, 2.25rem); margin-left: auto; }
+.bar__nav a {
+  position: relative;
+  display: inline-flex; align-items: baseline; gap: 0.45em;
+  padding: 0.4rem 0;
+  font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--vellum-soft);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.bar__nav a::after {
+  /* a tiny string under each link that "sounds" when its section is active */
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-out);
+}
+.bar__nav a:hover { color: var(--vellum); }
+.bar__nav a.is-active { color: var(--gold); }
+.bar__nav a.is-active::after { transform: scaleX(1); animation: hum 0.9s ease-out; }
+.bar__note { font-family: var(--caps); font-weight: 700; color: var(--vermilion); font-size: 0.9em; }
+
+@keyframes hum {
+  0%   { transform: scaleX(1) translateY(0); }
+  20%  { transform: scaleX(1) translateY(-1.5px); }
+  40%  { transform: scaleX(1) translateY(1.2px); }
+  60%  { transform: scaleX(1) translateY(-0.7px); }
+  80%  { transform: scaleX(1) translateY(0.3px); }
+  100% { transform: scaleX(1) translateY(0); }
+}
+
+.sound {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.9rem 0.35rem 0.6rem;
+  border: 1px solid color-mix(in oklch, var(--gold) 45%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--vellum);
+  font: 500 0.95rem var(--sans);
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+.sound:hover { border-color: var(--gold); }
+.sound[aria-pressed="true"] { background: var(--gold); color: var(--ink-on-gold); border-color: var(--gold); }
+.sound__icon { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.sound__icon path:first-child { fill: currentColor; }
+.sound__wave { display: none; }
+.sound[aria-pressed="true"] .sound__wave { display: block; }
+.sound[aria-pressed="true"] .sound__mute { display: none; }
+
+/* ------------------------------------------------------------------
+   Hero
+------------------------------------------------------------------ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  padding: 7rem var(--gutter) clamp(7rem, 16vh, 10rem);
+  /* the bottom edge meets the About section halfway between their colours */
+  background:
+    linear-gradient(to bottom, transparent calc(100% - var(--blend)), color-mix(in oklab, var(--lapis-deep) 50%, var(--varnish-deep))),
+    radial-gradient(120% 70% at 72% 105%, color-mix(in oklch, var(--varnish) 55%, transparent), transparent 70%),
+    var(--lapis-deep);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.hero__text { position: relative; z-index: 3; max-width: 40rem; pointer-events: none; }
+.hero__text a { pointer-events: auto; }
+
+.hero__name {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3.4rem, 8vw, 7.2rem);
+  line-height: 1;
+  color: var(--gold);
+  text-shadow: 0 0.04em 0.12em oklch(0.12 0.06 268 / 0.6);
+}
+.hero__name span { display: block; }
+.hero__name span + span { padding-left: 0.6em; }
+
+.hero__line {
+  margin: 1.75rem 0 0;
+  max-width: 27ch;
+  font-style: italic;
+  font-size: clamp(1.25rem, 1.1vw + 0.9rem, 1.75rem);
+  line-height: 1.35;
+  color: var(--vellum);
+  text-wrap: balance;
+}
+
+.hero__actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem;
+  margin-top: 2.25rem;
+  pointer-events: auto;
+}
+.hero__hint {
+  margin: 0;
+  max-width: 15rem;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--vellum-soft);
+}
+
+.strings { position: absolute; inset: 0; z-index: 2; }
+.strings__svg { width: 100%; height: 100%; overflow: visible; }
+
+/* Each note played rises from the string as a small drawn note, drifting and fading like a spark */
+.note-float {
+  fill: var(--gold);
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: note-rise 1.4s linear forwards;
+}
+@keyframes note-rise {
+  0%   { opacity: 0; transform: translate(0, 6px) rotate(0deg) scale(0.7); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  14%  { opacity: 1; transform: translate(0, -6px) rotate(0deg) scale(1); }
+  55%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--drift, 6px), -40px) rotate(var(--tilt, 8deg)) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-float { animation: note-fade 1s ease-out forwards; }
+  @keyframes note-fade { from { opacity: 1; } to { opacity: 0; } }
+}
+
+/* Where the scroll settles: the top of each section, and the middle of each project and of the puzzle */
+.hero, .field { scroll-snap-align: start; }
+#puzzle { scroll-snap-align: none; }
+.project, .wards { scroll-snap-align: center; }
+
+/* On larger screens each project (and the puzzle) gets a whole screen of its own, so each is its own stop */
+@media (min-width: 901px) {
+  /* every stop fits on one screen here, so the hold can be firm: a small scroll springs back, a strong one moves on */
+  html { scroll-snap-type: y mandatory; }
+  .project, .wards { min-height: calc(100svh - 4.5rem); }
+  .project { align-content: center; }
+  /* text and picture share the first row; the GitHub button (last project only) gets its own row below */
+  .project__text, .project__visual { grid-row: 1; }
+  .projects__more { grid-row: 2; }
+
+  /* the Projects heading gets a screen of its own, like a chapter's title page,
+     so the first project starts on the next stop instead of spilling into this one */
+  /* the stops in Projects are the title page and each project, not the whole (very tall) section,
+     so a scroll can never come to rest halfway between them */
+  #projects { padding-block: 0; scroll-snap-align: none; }
+  /* the puzzle screen centres itself, so it needs no extra padding (which would leave a gap too big to scroll across) */
+  #puzzle { padding-block: 0; }
+  .projects__head { scroll-snap-align: start; }
+  .projects__head {
+    min-height: calc(100svh - 4.5rem);
+    margin-bottom: 0;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .projects .project-list { gap: 0; }
+}
+
+/* ------------------------------------------------------------------
+   Fields: each section owns a whole ground
+------------------------------------------------------------------ */
+.field {
+  position: relative;
+  padding: clamp(5rem, 12vw, 10rem) var(--gutter);
+}
+.field--lapis   { --bg: var(--lapis); }
+.field--varnish { --bg: var(--varnish); }
+.field--wood    { --bg: var(--varnish-deep); }
+.field--deep    { --bg: var(--lapis-deep); }
+.field--night   { --bg: var(--night); }
+.field--gold    { --bg: var(--gold); color: var(--ink-on-gold); padding-bottom: 2rem; }
+
+/*
+  Smooth hand-offs between sections. Each boundary is a blend that straddles
+  the edge: the section above fades halfway toward the next colour, the
+  section below picks up from that same halfway colour. --prev and --next
+  name the neighbours; the halfway colours are mixed straight across (OKLab); night into gold (#puzzle, #contact) goes round the colour wheel so dark blue
+  into gold passes through a dusky dawn instead of grey.
+*/
+.field {
+  --prev: var(--bg);
+  --next: var(--bg);
+  --top: color-mix(in oklab, var(--prev) 50%, var(--bg));
+  --bottom: color-mix(in oklab, var(--next) 50%, var(--bg));
+  background: linear-gradient(
+    to bottom in oklab,
+    var(--top) 0,
+    var(--bg) var(--blend),
+    var(--bg) calc(100% - var(--blend)),
+    var(--bottom) 100%
+  );
+}
+/* Night into gold blends around the colour wheel instead, so it passes a dusky rose, like a sunrise */
+#puzzle, #contact {
+  --top: color-mix(in oklch, var(--prev) 50%, var(--bg));
+  --bottom: color-mix(in oklch, var(--next) 50%, var(--bg));
+  background: linear-gradient(
+    to bottom in oklch,
+    var(--top) 0,
+    var(--bg) var(--blend),
+    var(--bg) calc(100% - var(--blend)),
+    var(--bottom) 100%
+  );
+}
+#about    { --prev: var(--lapis-deep); --next: var(--lapis-deep); }
+#projects { --prev: var(--varnish-deep); --next: var(--night); }
+#puzzle   { --prev: var(--lapis-deep); --next: var(--gold); }
+#contact  { --prev: var(--night); }
+
+.heading {
+  margin: 0 0 2.5rem;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  line-height: 1.05;
+  color: var(--gold);
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 34ch;
+  margin: 0 0 3rem;
+  font-size: clamp(1.35rem, 1vw + 1rem, 1.75rem);
+  line-height: 1.4;
+  font-style: italic;
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------------
+   Buttons
+------------------------------------------------------------------ */
+.button {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.6rem 1.4rem;
+  border: 0; border-radius: 999px;
+  background: var(--gold); color: var(--ink-on-gold);
+  font: 700 1.05rem var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -10px oklch(0.1 0.01 40 / 0.55);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+.button:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -12px oklch(0.1 0.01 40 / 0.6); }
+.button:active { transform: translateY(0); }
+.button svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.button--small { min-height: 2.75rem; padding: 0.45rem 1.15rem; font-size: 1rem; }
+
+/* ------------------------------------------------------------------
+   Projects (C): the heart of the page
+------------------------------------------------------------------ */
+.projects { max-width: 78rem; margin: 0 auto; }
+.projects__head { margin-bottom: clamp(3.5rem, 7vw, 6rem); }
+.projects__head .lede { margin: 0; }
+
+.project-list {
+  margin: 0; padding: 0; list-style: none;
+  display: grid; gap: clamp(5rem, 11vw, 9.5rem);
+}
+.project {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+.project--flip { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.project--flip .project__text { order: 2; }
+
+.project__title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 3.3vw, 2.9rem);
+  line-height: 1.08;
+  color: var(--vellum);
+  text-wrap: balance;
+}
+.project__area {
+  margin: 0.7rem 0 0;
+  font-family: var(--caps); font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--vermilion);
+}
+.project__summary { margin: 1.25rem 0 0; max-width: 48ch; text-wrap: pretty; }
+.project__credit { margin: 0.75rem 0 0; font-style: italic; color: var(--vellum-soft); }
+.project__tech { margin: 1.25rem 0 0; font-family: var(--sans); font-size: 0.95rem; color: var(--gold); }
+.project__links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; margin: 1.75rem 0 0; }
+
+.link-code {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  min-height: 2.75rem;
+  font-family: var(--sans); font-weight: 700; font-size: 1rem;
+  color: var(--vellum);
+  text-decoration-color: color-mix(in oklch, var(--gold) 55%, transparent);
+  transition: color 0.3s, text-decoration-color 0.3s;
+}
+.link-code:hover { color: var(--gold); text-decoration-color: var(--gold); }
+.link-code svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* A real screenshot, tilted like a page held up to the light */
+.shot {
+  display: block;
+  border: 1px solid color-mix(in oklch, var(--gold) 40%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 34px 60px -30px oklch(0.06 0.03 268 / 0.95);
+  transform: perspective(1600px) rotateY(-5deg) rotateX(1deg);
+  transition: transform 0.9s var(--ease-out);
+}
+.project--flip .shot { transform: perspective(1600px) rotateY(5deg) rotateX(1deg); }
+.shot:hover, .project--flip .shot:hover { transform: none; }
+.shot img { display: block; width: 100%; height: auto; }
+
+.phones { display: flex; justify-content: center; align-items: flex-start; gap: clamp(1rem, 3vw, 2.25rem); padding-bottom: 2.5rem; }
+.phones img {
+  width: min(44%, 15.5rem);
+  height: auto;
+  border: 7px solid oklch(0.13 0.03 268);
+  border-radius: 26px;
+  outline: 1px solid color-mix(in oklch, var(--gold) 40%, transparent);
+  box-shadow: 0 30px 50px -28px oklch(0.06 0.03 268 / 0.95);
+  transition: transform 0.9s var(--ease-out);
+}
+.phones img:nth-child(2) { transform: translateY(2.5rem); }
+.phones:hover img { transform: translateY(-0.5rem); }
+.phones:hover img:nth-child(2) { transform: translateY(2rem); }
+
+/* How it works: steps strung on a gold string, with a bead of light running along it */
+.flow {
+  display: grid; align-content: center;
+  min-height: clamp(14rem, 24vw, 19rem);
+  padding: clamp(2.25rem, 4vw, 3.5rem) clamp(1rem, 2.5vw, 2rem);
+  border: 1px solid color-mix(in oklch, var(--gold) 22%, transparent);
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--lapis) 45%, var(--lapis-deep));
+}
+.flow ol {
+  --n: 4;
+  position: relative;
+  margin: 0; padding: 0; list-style: none;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+}
+.flow ol:has(> li:nth-child(3):last-child) { --n: 3; }
+.flow ol::before, .flow ol::after {
+  content: "";
+  position: absolute;
+  top: calc(0.8rem - 1px);
+  left: calc(50% / var(--n));
+  right: calc(50% / var(--n));
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+}
+.flow ol::after {
+  /* the bead: a short glint that runs from the first step to the last */
+  right: calc(50% / var(--n));
+  background: linear-gradient(90deg, transparent 0 40%, var(--vellum) 50%, transparent 60% 100%) no-repeat;
+  background-size: 30% 100%;
+  background-position: -40% 0;
+}
+.is-in .flow ol::after { animation: bead 3.6s var(--ease-out) 0.8s infinite; }
+@keyframes bead {
+  0%   { background-position: -40% 0; }
+  75%  { background-position: 140% 0; }
+  100% { background-position: 140% 0; }
+}
+.flow li {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: 0 0.35rem;
+  text-align: center;
+}
+.flow__knot {
+  width: 1.6rem; height: 1.6rem;
+  margin-bottom: 0.9rem;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: var(--lapis-deep);
+}
+.flow li:first-child .flow__knot, .flow li:last-child .flow__knot { background: var(--gold); }
+.flow b { font-weight: 700; font-size: clamp(1.1rem, 1.2vw, 1.3rem); line-height: 1.2; color: var(--vellum); }
+.flow li > span:not(.flow__knot) { font-family: var(--sans); font-size: 0.95rem; line-height: 1.35; color: var(--vellum-soft); }
+
+/* sits inside the last project's screen, centred under it */
+.projects__more { grid-column: 1 / -1; margin: clamp(1rem, 3vw, 2.5rem) 0 0; text-align: center; }
+
+/* An outlined version of the button, for a quieter call to action */
+.button--ghost {
+  min-height: 3.5rem;
+  padding: 0.75rem 1.9rem;
+  font-size: 1.15rem;
+  background: transparent;
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
+  box-shadow: none;
+  transition: transform 0.4s var(--ease-out), background-color 0.3s, color 0.3s;
+}
+.button--ghost:hover { background: var(--gold); color: var(--ink-on-gold); box-shadow: none; }
+.button--ghost svg { width: 1.3rem; height: 1.3rem; stroke-width: 1.6; }
+
+/* ------------------------------------------------------------------
+   About (G)
+------------------------------------------------------------------ */
+.about { max-width: 76rem; margin: 0 auto; }
+.about__body p { margin: 0 0 1.4em; max-width: 62ch; text-wrap: pretty; }
+.about__tbd { font-family: var(--display); font-size: clamp(2rem, 4vw, 3rem); color: var(--vellum-soft); }
+
+/* ------------------------------------------------------------------
+   Puzzle
+------------------------------------------------------------------ */
+.wards {
+  max-width: 76rem; margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(3rem, 6vw, 6rem);
+}
+.wards__text > p:not(.lede) { max-width: 46ch; color: var(--vellum-soft); margin: 0 0 2rem; }
+
+.message {
+  padding: 1.5rem 0 0;
+  border-top: 1px solid color-mix(in oklch, var(--gold) 30%, transparent);
+}
+.message p { margin: 0; font-family: var(--caps); font-weight: 500; letter-spacing: 0.08em; line-height: 1.35; }
+.message__cipher { font-size: 1rem; color: var(--vermilion); margin-bottom: 0.6rem !important; }
+.message__plain {
+  font-size: clamp(1.4rem, 2vw + 0.8rem, 2.1rem);
+  color: var(--vellum-soft);
+  min-height: 2.7em;
+  transition: color 0.6s var(--ease-out);
+}
+.message.is-solved .message__plain { color: var(--gold); }
+
+.wheel { display: grid; justify-items: center; gap: 1.25rem; }
+.wheel__svg {
+  width: min(100%, 30rem);
+  height: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  border-radius: 50%;
+}
+.wheel__svg:active { cursor: grabbing; }
+.wheel__svg:focus-visible { outline-offset: 8px; border-radius: 50%; }
+.wheel__svg .ring-outer { fill: var(--lapis); stroke: var(--gold-deep); stroke-width: 1.5; }
+.wheel__svg .ring-inner { fill: var(--varnish); stroke: var(--gold-deep); stroke-width: 1.5; }
+.wheel__svg .ring-hub   { fill: var(--night); stroke: var(--gold-deep); stroke-width: 1.5; }
+.wheel__svg .tick { stroke: color-mix(in oklch, var(--gold) 40%, transparent); stroke-width: 1; }
+.wheel__svg .glyph-outer { fill: var(--vellum); font-family: var(--caps); font-weight: 700; font-size: 19px; }
+.wheel__svg .glyph-inner { fill: var(--gold); font-family: var(--caps); font-weight: 500; font-size: 17px; }
+.wheel__svg .pointer { fill: var(--vermilion); }
+.wheel__svg .inner { transition: transform 0.7s var(--ease-out); }
+.wheel__svg.is-dragging .inner { transition: none; }
+.wheel__svg .hub-star { fill: none; stroke: var(--gold); stroke-width: 1.4; stroke-linejoin: round; transition: transform 1.2s var(--ease-out); transform-origin: 0 0; }
+.wheel.is-solved .hub-star { transform: rotate(45deg) scale(1.08); fill: color-mix(in oklch, var(--gold) 25%, transparent); }
+
+.wheel__controls { display: flex; align-items: center; gap: 1rem; }
+.wheel__controls kbd {
+  display: inline-block; min-width: 1.6em;
+  padding: 0 0.3em;
+  border: 1px solid color-mix(in oklch, var(--gold) 45%, transparent);
+  border-radius: 4px;
+  font: inherit; text-align: center; color: var(--gold);
+}
+.wheel__controls p { margin: 0; font-family: var(--sans); font-size: 0.95rem; color: var(--vellum-soft); text-align: center; }
+.wheel__btn {
+  display: grid; place-items: center;
+  width: 2.75rem; height: 2.75rem;
+  border: 1px solid color-mix(in oklch, var(--gold) 45%, transparent);
+  border-radius: 50%;
+  background: transparent; color: var(--gold);
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.wheel__btn:hover { background: var(--gold); color: var(--ink-on-gold); }
+.wheel__btn svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ------------------------------------------------------------------
+   Contact (A)
+------------------------------------------------------------------ */
+.field--gold ::selection { background: var(--ink-on-gold); color: var(--gold); }
+.field--gold :focus-visible { outline-color: var(--ink-on-gold); }
+
+.raven { max-width: 76rem; margin: 0 auto; padding-bottom: clamp(4rem, 10vw, 8rem); }
+.raven__heading {
+  margin: 0 0 1.5rem;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3.4rem, 10vw, 8.5rem);
+  line-height: 1;
+  color: var(--ink-on-gold);
+}
+.raven__line { margin: 0 0 2.5rem; max-width: 34ch; font-size: clamp(1.3rem, 1vw + 1rem, 1.7rem); font-style: italic; }
+.raven__mail {
+  display: inline-block;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.4rem, 4.2vw, 3.2rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+  transition: color 0.3s;
+}
+.raven__mail:hover { color: var(--varnish); }
+.raven__links { display: flex; gap: 2rem; margin: 3rem 0 0; padding: 0; list-style: none; font-family: var(--sans); font-weight: 700; }
+.raven__links a { display: inline-flex; align-items: center; gap: 0.55rem; min-height: 2.75rem; text-decoration: none; }
+.raven__links a:hover { text-decoration: underline; }
+.raven__links svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.colophon {
+  max-width: 76rem; margin: 0 auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in oklch, var(--ink-on-gold) 35%, transparent);
+  font-family: var(--sans); font-size: 0.95rem;
+}
+.colophon { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 2rem; }
+.colophon p { margin: 0; }
+
+/* ------------------------------------------------------------------
+   Reveal: content is visible by default; motion only when JS is on
+------------------------------------------------------------------ */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(1.75rem);
+  filter: blur(6px);
+  transition: opacity 1.1s var(--ease-out), transform 1.1s var(--ease-out), filter 1.1s var(--ease-out);
+}
+.js .reveal.is-in { opacity: 1; transform: none; filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .bar__nav a.is-active::after { animation: none; }
+  .is-in .flow ol::after { animation: none; }
+}
+
+/* ------------------------------------------------------------------
+   Responsive
+------------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .bar__nav { display: none; }
+  .sound { margin-left: auto; }
+  .bar__mark { opacity: 1; transform: none; }
+
+  .project, .project--flip { grid-template-columns: minmax(0, 1fr); }
+  .project--flip .project__text { order: 0; }
+  .shot, .project--flip .shot { transform: none; }
+
+  .wards { grid-template-columns: minmax(0, 1fr); }
+  .wheel { order: -1; }
+}
+
+@media (max-width: 600px) {
+  .hero { align-items: start; padding-top: 6.5rem; }
+  .hero__name { font-size: 2.9rem; }
+  .hero__name span + span { padding-left: 0; }
+  .hero__line { max-width: 15ch; }
+  .hero__hint { max-width: 12rem; }
+
+  /* the flow turns vertical: the string hangs down the left */
+  .flow ol { grid-auto-flow: row; gap: 1.4rem; }
+  .flow { min-height: 0; }
+  .flow ol::before { top: 0.8rem; bottom: 2.4rem; left: calc(0.8rem - 1px); right: auto; width: 2px; height: auto; background: linear-gradient(180deg, var(--gold-deep), var(--gold)); }
+  .flow ol::after { display: none; }
+  .flow li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); column-gap: 1rem; align-items: start; text-align: left; padding: 0; }
+  .flow__knot { grid-row: span 2; margin: 0.1rem 0 0; }
+  .sound__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .sound { padding: 0.35rem 0.6rem; }
+}

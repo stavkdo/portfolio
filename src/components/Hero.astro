@@ -1,0 +1,31 @@
+---
+import { site } from "../data/content";
+---
+
+<section class="hero" aria-label="Introduction">
+  <div class="hero__text">
+    <h1 class="hero__name">
+      <span>{site.firstName}</span>
+      <span>{site.lastName}</span>
+    </h1>
+    <p class="hero__line">Computer science student. I build software, explore cyber security, and play the cello.</p>
+    <div class="hero__actions">
+      <a class="button" href="#projects" data-string="1">
+        See my projects
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg>
+      </a>
+      <p class="hero__hint">
+        <span class="hero__hint-text">Run your cursor across the strings to play them. Click one, or press C, G, D or A, to jump to its section.</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="strings" aria-hidden="true">
+    <svg class="strings__svg"></svg>
+  </div>
+
+</section>
+
+<script>
+  import "../scripts/strings";
+</script>

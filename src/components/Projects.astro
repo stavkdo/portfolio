@@ -1,0 +1,81 @@
+---
+// G string: the main event
+import { projects, site } from "../data/content";
+
+const github =
+  "M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21";
+---
+
+<section class="field field--deep" id="projects">
+  <div class="projects">
+    <header class="projects__head">
+      <h2 class="heading reveal">Projects</h2>
+      <p class="lede reveal">
+        Things I've built, from security tools to games. Each one started with a question I wanted to answer.
+      </p>
+    </header>
+
+    <ol class="project-list">
+      {projects.map((p, i) => (
+        <li class:list={["project", { "project--flip": i % 2 === 1 }]}>
+          <div class="project__text reveal">
+            <h3 class="project__title">{p.title}</h3>
+            <p class="project__area">{p.area}</p>
+            <p class="project__summary">{p.summary}</p>
+            {p.credit && <p class="project__credit">{p.credit}</p>}
+            <p class="project__tech"><span class="sr">Built with: </span>{p.tech.join(" · ")}</p>
+            <p class="project__links">
+              {p.demo && (
+                <a class="button button--small" href={p.demo} target="_blank" rel="noopener">
+                  Try it live
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg>
+                </a>
+              )}
+              <a class="link-code" href={p.repo} target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={github}></path></svg>
+                View the code
+              </a>
+            </p>
+          </div>
+
+          <div class="project__visual reveal">
+            {p.visual.kind === "image" && (
+              <a class="shot" href={p.demo ?? p.repo} target="_blank" rel="noopener" tabindex="-1">
+                <img src={p.visual.src} alt={p.visual.alt} loading="lazy" decoding="async" width={p.visual.width} height={p.visual.height} />
+              </a>
+            )}
+            {p.visual.kind === "phones" && (
+              <a class="phones" href={p.demo ?? p.repo} target="_blank" rel="noopener" tabindex="-1">
+                {p.visual.shots.map((s) => (
+                  <img src={s.src} alt={s.alt} loading="lazy" decoding="async" width="800" height="1440" />
+                ))}
+              </a>
+            )}
+            {p.visual.kind === "flow" && (
+              <div class="flow" role="img" aria-label={`How it works: ${p.visual.steps.map((s) => s.label).join(", then ")}`}>
+                <ol>
+                  {p.visual.steps.map((s) => (
+                    <li>
+                      <span class="flow__knot" aria-hidden="true"></span>
+                      <b>{s.label}</b>
+                      {s.note && <span>{s.note}</span>}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+          </div>
+
+          {i === projects.length - 1 && (
+            <p class="projects__more reveal">
+              <a class="button button--ghost" href={site.github} target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={github}></path></svg>
+                More on GitHub
+              </a>
+            </p>
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

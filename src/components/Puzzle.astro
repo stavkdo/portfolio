@@ -1,0 +1,50 @@
+---
+// A small interlude: the cipher wheel
+interface Props {
+  /** The hidden message, and the ring offset that locks it */
+  secret?: string;
+  cipherKey?: number;
+}
+const { secret = "THANKS FOR STOPPING BY", cipherKey = 9 } = Astro.props;
+---
+
+<section class="field field--night" id="puzzle" aria-labelledby="puzzle-title">
+  <div class="wards">
+    <div class="wards__text">
+      <h2 class="heading reveal" id="puzzle-title">One last puzzle</h2>
+      <p class="lede reveal">There's a hidden message below. Turn the inner ring until it makes sense.</p>
+
+      <div class="message reveal" aria-live="polite" data-secret={secret} data-key={cipherKey}>
+        <p class="message__cipher" aria-label="Scrambled message"></p>
+        <p class="message__plain"></p>
+      </div>
+    </div>
+
+    <div class="wheel reveal">
+      <svg
+        class="wheel__svg"
+        viewBox="-200 -200 400 400"
+        role="slider"
+        tabindex="0"
+        aria-label="Inner ring"
+        aria-valuemin="0"
+        aria-valuemax="25"
+        aria-valuenow="0"
+        aria-describedby="wheel-help"
+      ></svg>
+      <div class="wheel__controls">
+        <button type="button" class="wheel__btn" data-dir="-1" aria-label="Turn ring left">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+        </button>
+        <p id="wheel-help">Drag the ring, or press <kbd>←</kbd> <kbd>→</kbd></p>
+        <button type="button" class="wheel__btn" data-dir="1" aria-label="Turn ring right">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import "../scripts/cipher";
+</script>
