@@ -1,6 +1,6 @@
 # Stav Kdoshim · Portfolio
 
-My personal portfolio: a computer science student who builds software, explores cyber security and plays the cello. The site is designed like a page from a fantasy book, and the opening screen is a cello you can play.
+My personal portfolio: a computer science student who builds software, explores cyber security and in my free time plays the cello.
 
 ![The opening screen: my name in gold calligraphy beside a cello's fingerboard, strings and bridge](docs/screenshot-hero.jpg)
 
@@ -33,41 +33,6 @@ My personal portfolio: a computer science student who builds software, explores 
 - SVG for the cello, the strings, the diagrams and the cipher wheel
 - Fonts: [Eagle Lake](https://fonts.google.com/specimen/Eagle+Lake) for headings and [Alegreya](https://fonts.google.com/specimen/Alegreya) for text
 - Designed with the help of [Impeccable](https://github.com/pbakaus/impeccable), a design skill for AI coding agents
-
-## Run it locally
-
-You need [Node.js](https://nodejs.org) 20 or newer.
-
-```bash
-npm install      # install dependencies (once)
-npm run dev      # start the site at http://localhost:4321
-npm run build    # build the finished site into dist/
-npm run preview  # preview the built site
-```
-
-## Where things are
-
-```
-src/
-├── data/content.ts      All the text: name, projects, links, section names
-├── components/          One file per section (Hero, About, Projects, Puzzle, Contact, TopBar)
-├── scripts/
-│   ├── audio.ts         The cello sound, with every setting at the top
-│   ├── strings.ts       Drawing and playing the strings, and keyboard shortcuts
-│   ├── cipher.ts        The cipher wheel
-│   └── ...              Navigation, scroll reveals, the drifting specks of light
-├── styles/global.css    All styling: colours, fonts, layout, scroll behaviour
-└── pages/index.astro    Puts the sections together
-public/projects/         Project screenshots
-```
-
-## Making changes
-
-- **Text and projects:** edit [`src/data/content.ts`](src/data/content.ts). Adding a project means adding one entry to the `projects` list.
-- **The About section:** [`src/components/About.astro`](src/components/About.astro).
-- **The cello's sound:** the `CELLO` block at the top of [`src/scripts/audio.ts`](src/scripts/audio.ts). Each setting (warmth, brightness, vibrato, echo and more) has a short note explaining it.
-- **Colours and fonts:** the variables at the top of [`src/styles/global.css`](src/styles/global.css).
-- **How firmly the page settles while scrolling:** search for `scroll-snap-type` in `global.css` (`mandatory` is firm, `proximity` is gentle).
 
 ## Contact
 
