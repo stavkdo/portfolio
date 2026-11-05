@@ -20,7 +20,7 @@ export const CELLO = {
   /** Overall volume, 0 to 1. */
   volume: 0.9,
   /** How long a note rings when you cross a string, in seconds. */
-  noteLength: 1.6,
+  noteLength: 1,
   /** How long the note takes to swell in, in seconds. Shorter = quicker response, longer = softer (try 0.02 to 0.15). */
   attack: 0.03,
   /** How long the note takes to fade out, in seconds. */

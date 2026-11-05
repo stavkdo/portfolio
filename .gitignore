@@ -8,3 +8,4 @@ dist/
 .impeccable/hook.cache.json
 # The Impeccable program downloads itself on first run; no need to store 19 MB in git
 .claude/skills/impeccable/scripts/bin/
+.impeccable/questions/

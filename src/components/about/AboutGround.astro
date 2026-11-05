@@ -1,0 +1,54 @@
+---
+// About me: one long shelf runs the full width of the section. The text and the books
+// both stand on it, so the whole section reads as a single bookcase shelf.
+import Shelf from "./Shelf.astro";
+---
+
+<section class="field" id="about">
+  <div class="ab2">
+    <div class="ab2__row">
+      <div class="ab2__text">
+        <h2 class="heading reveal">About me</h2>
+        <p class="ab2__intro reveal">
+          Hi again, I'm Stav a final year computer science student, focusing on cyber security, cryptography and
+          software development.
+        </p>
+        <p class="ab2__body reveal">
+          I love building things, and even more, understanding how they work behind the scenes. In my free time
+          you'll find me practising martial arts or, as you may have guessed by now, playing the cello.
+        </p>
+      </div>
+      <Shelf plank={false} size="min(17px, 3.6vw)" class="ab2__books" />
+    </div>
+    <div class="ab2__plank reveal" aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .ab2 { max-width: 76rem; margin: 0 auto; }
+  .ab2__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: clamp(2rem, 5vw, 5rem); padding: 0 clamp(0rem, 2vw, 2rem); }
+  .ab2__text { padding-bottom: 1.6rem; }
+  .ab2__text .heading { font-size: clamp(3.2rem, 8vw, 6.5rem); margin-bottom: 1.75rem; }
+  .ab2__intro { max-width: 34ch; margin: 0; font-size: clamp(1.3rem, 1vw + 0.9rem, 1.75rem); line-height: 1.4; font-style: italic; color: var(--vellum); }
+  .ab2__body { max-width: 56ch; margin: 1.25rem 0 0; color: var(--vellum-soft); }
+  .ab2__plank {
+    height: clamp(0.9rem, 1.3vw, 1.15rem);
+    background: linear-gradient(var(--varnish-lit), var(--varnish) 30%, var(--varnish-deep));
+    border-radius: 3px;
+    box-shadow: 0 22px 26px -16px oklch(0.06 0.04 268 / 0.9);
+  }
+  /* brackets under the shelf, at each end */
+  .ab2__plank { position: relative; }
+  .ab2__plank::before, .ab2__plank::after {
+    content: ""; position: absolute; top: 100%; width: 1.1rem; height: 2.4rem;
+    background: linear-gradient(90deg, var(--varnish-deep), var(--varnish));
+    clip-path: polygon(0 0, 100% 0, 100% 18%, 18% 100%, 0 100%);
+  }
+  .ab2__plank::before { left: 8%; }
+  .ab2__plank::after { right: 8%; transform: scaleX(-1); }
+  @media (max-width: 900px) {
+    .ab2__row { grid-template-columns: minmax(0, 1fr); }
+    .ab2__text { padding-bottom: 0.5rem; }
+    .ab2 :global(.ab2__books) { justify-self: center; }
+  }
+</style>

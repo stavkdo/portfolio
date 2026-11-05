@@ -279,6 +279,7 @@ hero.addEventListener("pointerup", (e) => {
 const KEYS: Record<string, number> = { c: 0, g: 1, d: 2, a: 3 };
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  if (document.querySelector("dialog[open]")) return; // a popup is open: its keys are its own
   const el = e.target as HTMLElement;
   if (el.closest("input, textarea, select, [contenteditable]")) return;
   const i = KEYS[e.key.toLowerCase()];

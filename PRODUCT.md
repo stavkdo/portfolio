@@ -45,7 +45,7 @@ Visitors come from links in CVs, applications and social profiles, on desktop an
 - Six real projects from github.com/stavkdo, described from their READMEs and code: Quantum-Ready TLS Proxy, Malware Detector, Password Defence Lab (course project with Ofir Sasson), Record Library (live demo), Job Application Tracker, Puzzle Games (live demo). Content lives in `src/data/content.ts`.
 - Screenshots in `public/projects/`: Record Library (supplied by Stav, username removed) and the two puzzle games (captured from the live demo).
 - Contact: stavkd04@gmail.com, github.com/stavkdo, linkedin.com/in/stav-kdoshim.
-- About text is still TBD; Stav will write it.
+- About text written by Stav (final-year CS student; cyber security, cryptography, software development; martial arts and cello).
 - Do not invent projects, achievements, CTF results, skills or credentials.
 
 ## Product Principles

@@ -1,0 +1,64 @@
+---
+// The bookshelf in About me: one spine for each pursuit, plus a couple of fantasy tomes (see data/shelf.ts).
+import { books } from "../../data/shelf";
+
+interface Props {
+  /** the size of one em of the shelf; every book is measured in em */
+  size?: string;
+  /** draw a plank under the books (About me draws its own, full width) */
+  plank?: boolean;
+  class?: string;
+}
+const { size = "min(16px, 3.6vw)", plank = true, class: extra } = Astro.props;
+---
+
+<figure class:list={["shelf reveal", extra]} aria-hidden="true" style={`--shelf-size:${size}`}>
+  <div class="shelf__books">
+    {books.map((b) => (
+      <div
+        class:list={["spine", { "spine--light": b.light, "spine--lean": b.lean }]}
+        style={`--h:${b.h}em; --w:${b.w}em; --c:${b.color}`}
+      >
+        {b.title ? <span>{b.title}</span> : <i class="spine__mark"></i>}
+      </div>
+    ))}
+  </div>
+  {plank && <div class="shelf__plank"></div>}
+</figure>
+
+<style>
+  .shelf { margin: 0; justify-self: center; font-size: var(--shelf-size); }
+  .shelf__books { display: flex; align-items: end; gap: 0.2em; padding: 0 0.6em; }
+  .spine {
+    position: relative; flex: none;
+    width: var(--w); height: var(--h);
+    display: grid; place-items: center;
+    border-radius: 0.25em 0.25em 0.1em 0.1em;
+    /* gold bands at the head and tail of the spine, and a curve of light across its roundness */
+    background:
+      linear-gradient(transparent 7%, var(--gold-deep) 7% 7.6%, transparent 7.6% 9%, var(--gold-deep) 9% 9.4%, transparent 9.4% 90.6%, var(--gold-deep) 90.6% 91%, transparent 91% 92.4%, var(--gold-deep) 92.4% 93%, transparent 93%),
+      linear-gradient(90deg, oklch(0 0 0 / 0.28), oklch(1 0 0 / 0.08) 35%, oklch(0 0 0 / 0.12) 70%, oklch(0 0 0 / 0.3)),
+      var(--c);
+    box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.25);
+    transition: transform 0.35s var(--ease-out);
+  }
+  /* point at a book and it lifts a little off the shelf */
+  .spine:not(.spine--lean):hover { transform: translateY(-0.7em); }
+  .spine span {
+    writing-mode: vertical-rl;
+    font-family: var(--caps); font-weight: 700; font-size: 1.05em; letter-spacing: 0.04em;
+    color: var(--gold); white-space: nowrap;
+  }
+  .spine--light span { color: oklch(0.3 0.06 45); }
+  .spine__mark { width: 0.6em; height: 0.6em; background: var(--gold); transform: rotate(45deg); }
+  .spine--lean { margin-left: 2.6em; transform-origin: 0 100%; transform: rotate(-9.5deg); }
+  .shelf__plank {
+    height: 1em; margin: 0 -0.4em;
+    background: linear-gradient(var(--varnish-lit), var(--varnish) 30%, var(--varnish-deep));
+    border-radius: 0.15em;
+    box-shadow: 0 1.4em 1.6em -1em oklch(0.06 0.04 268 / 0.9);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spine { transition: none; }
+  }
+</style>

@@ -22,6 +22,8 @@ export type Project = {
   tech: string[];
   repo: string;
   demo?: string;
+  /** Games that open in a popup on this page instead of leaving the site */
+  play?: { label: string; src: string }[];
   /** Optional credit for team projects */
   credit?: string;
   /** A screenshot (or two phone screenshots), or a flow of how it works */
@@ -30,6 +32,17 @@ export type Project = {
     | { kind: "phones"; shots: { src: string; alt: string }[] }
     | { kind: "flow"; steps: Step[] };
 };
+
+// The video on the Projects title screen: me presenting one of my projects.
+// PLACEHOLDER: when the video is ready, put the file in public/videos/ and set
+// src (e.g. "/videos/presenting.mp4"); poster is an optional still image to show before it plays.
+export const projectsVideo: { src?: string; poster?: string; caption: string } = {
+  caption: "TBD",
+};
+
+/** The anchor of a project on the page, e.g. "project-record-library". */
+export const projectId = (title: string) =>
+  "project-" + title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 // Taken from github.com/stavkdo, most impressive first.
 export const projects: Project[] = [
@@ -54,7 +67,7 @@ export const projects: Project[] = [
     title: "Malware Detector",
     area: "Cyber security · Machine learning",
     summary:
-      "A machine-learning model that looks at a Windows program and predicts whether it's malware. I trained and compared Random Forest, k-NN and LightGBM models on the EMBER dataset and packaged it with Docker.",
+      "A machine learning model that looks at a program's static features and predicts whether it's malware. I trained and compared Random Forest, k-NN and LightGBM models on the EMBER dataset and packaged it with Docker.",
     tech: ["Python", "scikit-learn", "LightGBM", "Docker"],
     repo: "https://github.com/stavkdo/malware-detector",
     visual: {
@@ -121,10 +134,14 @@ export const projects: Project[] = [
     title: "Puzzle Games",
     area: "Web · Games",
     summary:
-      "Two daily-style logic puzzles, Einstein's Zebra riddle and Lights Out, built from scratch with plain HTML, CSS and JavaScript, and illustrated with my own drawings.",
+      "Two daily style logic puzzles, Einstein's Zebra riddle and Lights Out, built from scratch with plain HTML, CSS and JavaScript, and illustrated with my own drawings.",
     tech: ["HTML", "CSS", "JavaScript", "SVG"],
     repo: "https://github.com/stavkdo/puzzle-games",
     demo: "https://zebra-puzzle.vercel.app",
+    play: [
+      { label: "Zebra", src: "https://zebra-puzzle.vercel.app/game_one.html" },
+      { label: "Lights Out", src: "https://zebra-puzzle.vercel.app/game_two.html" },
+    ],
     visual: {
       kind: "phones",
       shots: [

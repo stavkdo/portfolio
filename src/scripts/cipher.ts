@@ -1,5 +1,4 @@
 /* An Alberti cipher disc: turn the inner ring to decode the message. */
-import { audio } from "./audio";
 import { el } from "./svg";
 
 const svg = document.querySelector<SVGSVGElement>(".wheel__svg")!;
@@ -69,10 +68,6 @@ function render(animated = true) {
   svg.setAttribute("aria-valuetext", `Offset ${shift}`);
   plainOut.textContent = [...CIPHER].map((c) => shiftChar(c, -shift)).join("");
   const solved = shift === KEY;
-  if (solved && !msg.classList.contains("is-solved") && audio.enabled) {
-    const t = audio.now + 0.05;
-    [146.83, 220.0, 293.66].forEach((f, k) => audio.bow(f, { when: t + k * 0.12, dur: 1.2, level: 0.4 }));
-  }
   msg.classList.toggle("is-solved", solved);
   wheel.classList.toggle("is-solved", solved);
 }
@@ -84,12 +79,10 @@ const angleOf = (e: PointerEvent) => {
 
 let dragging = false;
 let lastAngle = 0;
-let lastStep = 0;
 
 svg.addEventListener("pointerdown", (e) => {
   dragging = true;
   lastAngle = angleOf(e);
-  lastStep = Math.round(rot / STEP);
   svg.setPointerCapture(e.pointerId);
   svg.classList.add("is-dragging");
 });
@@ -103,11 +96,6 @@ svg.addEventListener("pointermove", (e) => {
   lastAngle = a;
   rot -= d; // dragging clockwise turns the ring clockwise
   render(false);
-  const stepNow = Math.round(rot / STEP);
-  if (stepNow !== lastStep) {
-    lastStep = stepNow;
-    audio.bow(392 + (shift % 5) * 20, { dur: 0.08, level: 0.18, attack: 0.015, vibrato: false });
-  }
 });
 
 const end = () => {
@@ -134,6 +122,7 @@ if (puzzle) {
 
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (document.querySelector("dialog[open]")) return;
   const focused = document.activeElement === svg;
   if (!focused && !puzzleInView) return;
   if ((e.target as HTMLElement).closest("input, textarea, select, [contenteditable]")) return;

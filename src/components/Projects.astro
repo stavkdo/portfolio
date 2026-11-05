@@ -1,23 +1,42 @@
 ---
 // G string: the main event
-import { projects, site } from "../data/content";
+import { projects, projectsVideo, site, projectId } from "../data/content";
+import GamePlayer from "./GamePlayer.astro";
+
+const playable = projects.find((p) => p.play);
 
 const github =
   "M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21";
 ---
 
-<section class="field field--deep" id="projects">
+<section class="field" id="projects">
   <div class="projects">
     <header class="projects__head">
-      <h2 class="heading reveal">Projects</h2>
-      <p class="lede reveal">
-        Things I've built, from security tools to games. Each one started with a question I wanted to answer.
-      </p>
+      <div class="projects__intro">
+        <h2 class="heading reveal">Projects</h2>
+        <p class="lede reveal">
+          The things I've built, from security tools to games. Each one started with a question I wanted to answer, something that I wanted to explore or a fun idea I had.
+        </p>
+      </div>
+
+      <figure class="video reveal">
+        {projectsVideo.src ? (
+          <video class="video__frame" src={projectsVideo.src} poster={projectsVideo.poster} controls preload="metadata" playsinline></video>
+        ) : (
+          <div class="video__frame video__frame--empty" role="img" aria-label="Video coming soon">
+            <span class="video__play" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"></path></svg>
+            </span>
+            <span class="video__soon">Video coming soon</span>
+          </div>
+        )}
+        <figcaption>{projectsVideo.caption}</figcaption>
+      </figure>
     </header>
 
     <ol class="project-list">
       {projects.map((p, i) => (
-        <li class:list={["project", { "project--flip": i % 2 === 1 }]}>
+        <li class:list={["project", { "project--flip": i % 2 === 1 }]} id={projectId(p.title)}>
           <div class="project__text reveal">
             <h3 class="project__title">{p.title}</h3>
             <p class="project__area">{p.area}</p>
@@ -25,7 +44,13 @@ const github =
             {p.credit && <p class="project__credit">{p.credit}</p>}
             <p class="project__tech"><span class="sr">Built with: </span>{p.tech.join(" · ")}</p>
             <p class="project__links">
-              {p.demo && (
+              {p.play?.map((g) => (
+                <a class="button button--small" href={g.src} target="_blank" rel="noopener" data-play data-label={g.label}>
+                  Play {g.label}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"></path></svg>
+                </a>
+              ))}
+              {p.demo && !p.play && (
                 <a class="button button--small" href={p.demo} target="_blank" rel="noopener">
                   Try it live
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg>
@@ -45,11 +70,13 @@ const github =
               </a>
             )}
             {p.visual.kind === "phones" && (
-              <a class="phones" href={p.demo ?? p.repo} target="_blank" rel="noopener" tabindex="-1">
-                {p.visual.shots.map((s) => (
-                  <img src={s.src} alt={s.alt} loading="lazy" decoding="async" width="800" height="1440" />
+              <div class="phones">
+                {p.visual.shots.map((s, k) => (
+                  <a href={p.play?.[k]?.src ?? p.demo ?? p.repo} target="_blank" rel="noopener" tabindex="-1" data-play={p.play ? "" : undefined} data-label={p.play?.[k]?.label}>
+                    <img src={s.src} alt={s.alt} loading="lazy" decoding="async" width="800" height="1440" />
+                  </a>
                 ))}
-              </a>
+              </div>
             )}
             {p.visual.kind === "flow" && (
               <div class="flow" role="img" aria-label={`How it works: ${p.visual.steps.map((s) => s.label).join(", then ")}`}>
@@ -78,4 +105,6 @@ const github =
       ))}
     </ol>
   </div>
+
+  {playable?.play && <GamePlayer games={playable.play} />}
 </section>

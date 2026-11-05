@@ -1,0 +1,22 @@
+---
+// A clean popup that plays a puzzle game right here, straight into the game (no menu screen)
+interface Props {
+  games: { label: string; src: string }[];
+}
+const { games } = Astro.props;
+---
+
+<dialog class="game" aria-label="Puzzle game">
+  <div class="game__stage">
+    <!-- the game pages are "full height plus a small margin", so they would always show a scrollbar
+         for that empty margin; scrolling="no" hides it (the Zebra clue list keeps its own scrolling) -->
+    <iframe class="game__frame" title={games[0].label} loading="lazy" scrolling="no"></iframe>
+  </div>
+  <button type="button" class="game__close" aria-label="Close the game">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+  </button>
+</dialog>
+
+<script>
+  import "../scripts/games";
+</script>

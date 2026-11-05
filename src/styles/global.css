@@ -17,6 +17,12 @@
   --vellum-soft:  oklch(0.85 0.035 84);
   --ink-on-gold:  oklch(0.24 0.08 268);
 
+  /* the sky, from night to the last blue before dawn */
+  --sky-night:    oklch(0.235 0.07 268);
+  --sky-deep:     oklch(0.255 0.08 266);
+  --sky-twilight: oklch(0.285 0.095 263);
+  --sky-predawn:  oklch(0.315 0.09 284);
+
   --display: "Eagle Lake", "Alegreya", serif;
   --serif:   "Alegreya", Georgia, serif;
   --caps:    "Alegreya SC", "Alegreya", serif;
@@ -25,6 +31,8 @@
   --gutter: clamp(1rem, 5vw, 5rem);
   /* how tall each colour hand-off between sections is, on each side of the edge */
   --blend: clamp(5rem, 14vh, 9rem);
+  /* how tall the sunrise above the Contact section is */
+  --sunrise: clamp(10rem, 28vh, 18rem);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   color-scheme: dark;
@@ -205,10 +213,7 @@ main { position: relative; }
   align-items: end;
   padding: 7rem var(--gutter) clamp(7rem, 16vh, 10rem);
   /* the bottom edge meets the About section halfway between their colours */
-  background:
-    linear-gradient(to bottom, transparent calc(100% - var(--blend)), color-mix(in oklab, var(--lapis-deep) 50%, var(--varnish-deep))),
-    radial-gradient(120% 70% at 72% 105%, color-mix(in oklch, var(--varnish) 55%, transparent), transparent 70%),
-    var(--lapis-deep);
+  /* transparent: the sky shows through, and the warm glow around the bridge lives on the sky (see .sky) */
   overflow: hidden;
   touch-action: pan-y;
 }
@@ -283,7 +288,10 @@ main { position: relative; }
 @media (min-width: 901px) {
   /* every stop fits on one screen here, so the hold can be firm: a small scroll springs back, a strong one moves on */
   html { scroll-snap-type: y mandatory; }
-  .project, .wards { min-height: calc(100svh - 4.5rem); }
+  .project { min-height: calc(100svh - 4.5rem); }
+  #about { min-height: calc(100svh - 4.5rem); padding-block: 2rem; display: grid; align-content: center; } /* exactly one screen below the top bar, content centred */
+  /* the puzzle shares its screen with the sunrise below it, so puzzle + sunrise make one stop's worth of scroll */
+  .wards { min-height: calc(100svh - 4.5rem - var(--sunrise)); }
   .project { align-content: center; }
   /* text and picture share the first row; the GitHub button (last project only) gets its own row below */
   .project__text, .project__visual { grid-row: 1; }
@@ -295,66 +303,66 @@ main { position: relative; }
      so a scroll can never come to rest halfway between them */
   #projects { padding-block: 0; scroll-snap-align: none; }
   /* the puzzle screen centres itself, so it needs no extra padding (which would leave a gap too big to scroll across) */
-  #puzzle { padding-block: 0; }
+  #puzzle { padding-block: calc(var(--sunrise) / 2) var(--sunrise); }
   .projects__head { scroll-snap-align: start; }
   .projects__head {
     min-height: calc(100svh - 4.5rem);
     margin-bottom: 0;
-    display: flex; flex-direction: column; justify-content: center;
+    align-content: center;
   }
   .projects .project-list { gap: 0; }
 }
 
 /* ------------------------------------------------------------------
-   Fields: each section owns a whole ground
+   The sky: one background behind the whole page that turns from night
+   to day as you scroll. Deep night at the top, lifting through twilight
+   as you read on, the last blue before sunrise at the puzzle, then dawn
+   breaking into the gold of the Contact section.
 ------------------------------------------------------------------ */
+.sky {
+  --dawn: color-mix(in oklch, var(--sky-predawn) 50%, var(--gold)); /* the rose where night meets the gold */
+  background:
+    /* a warm glow of wood rising around the cello's bridge. It lives on the sky rather than the
+       opening screen, so it can fade softly into the About section instead of being cut off at the edge */
+    radial-gradient(90% 55svh at 72% 102svh, color-mix(in oklch, var(--varnish) 45%, transparent), transparent 70%),
+    /* the first light, in the last stretch before Contact: eased in, so it starts without a visible edge */
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - var(--sunrise)),
+      color-mix(in oklch, var(--dawn) 6%, transparent) calc(100% - var(--sunrise) * 0.75),
+      color-mix(in oklch, var(--dawn) 25%, transparent) calc(100% - var(--sunrise) * 0.5),
+      color-mix(in oklch, var(--dawn) 62%, transparent) calc(100% - var(--sunrise) * 0.25),
+      var(--dawn) 100%
+    ),
+    /* night lifting into twilight */
+    linear-gradient(
+      to bottom in oklab,
+      var(--sky-night) 0%,
+      var(--sky-night) 9%,
+      var(--sky-deep) 22%,
+      var(--sky-twilight) 62%,
+      var(--sky-twilight) 84%,
+      var(--sky-predawn) 100%
+    );
+}
+
 .field {
   position: relative;
   padding: clamp(5rem, 12vw, 10rem) var(--gutter);
 }
-.field--lapis   { --bg: var(--lapis); }
-.field--varnish { --bg: var(--varnish); }
-.field--wood    { --bg: var(--varnish-deep); }
-.field--deep    { --bg: var(--lapis-deep); }
-.field--night   { --bg: var(--night); }
-.field--gold    { --bg: var(--gold); color: var(--ink-on-gold); padding-bottom: 2rem; }
+.field--gold { color: var(--ink-on-gold); padding-bottom: 2rem; }
+/* the sunrise rises in the empty sky under the puzzle, never behind its text */
+#puzzle { padding-bottom: var(--sunrise); }
 
-/*
-  Smooth hand-offs between sections. Each boundary is a blend that straddles
-  the edge: the section above fades halfway toward the next colour, the
-  section below picks up from that same halfway colour. --prev and --next
-  name the neighbours; the halfway colours are mixed straight across (OKLab); night into gold (#puzzle, #contact) goes round the colour wheel so dark blue
-  into gold passes through a dusky dawn instead of grey.
-*/
-.field {
-  --prev: var(--bg);
-  --next: var(--bg);
-  --top: color-mix(in oklab, var(--prev) 50%, var(--bg));
-  --bottom: color-mix(in oklab, var(--next) 50%, var(--bg));
-  background: linear-gradient(
-    to bottom in oklab,
-    var(--top) 0,
-    var(--bg) var(--blend),
-    var(--bg) calc(100% - var(--blend)),
-    var(--bottom) 100%
-  );
-}
-/* Night into gold blends around the colour wheel instead, so it passes a dusky rose, like a sunrise */
-#puzzle, #contact {
-  --top: color-mix(in oklch, var(--prev) 50%, var(--bg));
-  --bottom: color-mix(in oklch, var(--next) 50%, var(--bg));
+/* Contact keeps its dawn: it starts on the same rose the sky ends on and rises into gold */
+#contact {
+  margin-top: -2px; /* overlap the sky slightly so no hairline of the page background shows between them */
   background: linear-gradient(
     to bottom in oklch,
-    var(--top) 0,
-    var(--bg) var(--blend),
-    var(--bg) calc(100% - var(--blend)),
-    var(--bottom) 100%
+    color-mix(in oklch, var(--sky-predawn) 50%, var(--gold)) 0,
+    var(--gold) var(--blend)
   );
 }
-#about    { --prev: var(--lapis-deep); --next: var(--lapis-deep); }
-#projects { --prev: var(--varnish-deep); --next: var(--night); }
-#puzzle   { --prev: var(--lapis-deep); --next: var(--gold); }
-#contact  { --prev: var(--night); }
 
 .heading {
   margin: 0 0 2.5rem;
@@ -399,7 +407,41 @@ main { position: relative; }
    Projects (C): the heart of the page
 ------------------------------------------------------------------ */
 .projects { max-width: 78rem; margin: 0 auto; }
-.projects__head { margin-bottom: clamp(3.5rem, 7vw, 6rem); }
+.projects__head {
+  margin-bottom: clamp(3.5rem, 7vw, 6rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+/* the video on the Projects title screen (a placeholder until it exists) */
+.video { margin: 0; }
+.video__frame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid color-mix(in oklch, var(--gold) 45%, transparent);
+  border-radius: 14px;
+  background: oklch(0.13 0.04 268);
+  box-shadow: 0 30px 60px -30px oklch(0.05 0.03 268 / 0.95);
+}
+.video__frame--empty {
+  display: grid; place-content: center; justify-items: center; gap: 1rem;
+  background:
+    radial-gradient(60% 70% at 50% 45%, color-mix(in oklch, var(--lapis) 55%, transparent), transparent),
+    oklch(0.15 0.05 268);
+}
+.video__play {
+  display: grid; place-items: center;
+  width: 4.5rem; height: 4.5rem;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold);
+}
+.video__play svg { width: 1.8rem; height: 1.8rem; fill: currentColor; translate: 2px 0; }
+.video__soon { font-family: var(--caps); font-weight: 700; font-size: 1.05rem; color: var(--vellum-soft); }
+.video figcaption { margin-top: 0.9rem; font-family: var(--sans); font-size: 0.95rem; color: var(--vellum-soft); }
 .projects__head .lede { margin: 0; }
 
 .project-list {
@@ -470,9 +512,11 @@ main { position: relative; }
   box-shadow: 0 30px 50px -28px oklch(0.06 0.03 268 / 0.95);
   transition: transform 0.9s var(--ease-out);
 }
-.phones img:nth-child(2) { transform: translateY(2.5rem); }
-.phones:hover img { transform: translateY(-0.5rem); }
-.phones:hover img:nth-child(2) { transform: translateY(2rem); }
+.phones a { display: contents; }
+.phones a:nth-child(2) img { transform: translateY(2.5rem); }
+/* each phone lifts on its own when you point at it */
+.phones img:hover { transform: translateY(-0.5rem); }
+.phones a:nth-child(2) img:hover { transform: translateY(2rem); }
 
 /* How it works: steps strung on a gold string, with a bead of light running along it */
 .flow {
@@ -481,7 +525,7 @@ main { position: relative; }
   padding: clamp(2.25rem, 4vw, 3.5rem) clamp(1rem, 2.5vw, 2rem);
   border: 1px solid color-mix(in oklch, var(--gold) 22%, transparent);
   border-radius: 14px;
-  background: color-mix(in oklch, var(--lapis) 45%, var(--lapis-deep));
+  background: color-mix(in oklch, var(--lapis) 30%, transparent);
 }
 .flow ol {
   --n: 4;
@@ -547,41 +591,113 @@ main { position: relative; }
 .button--ghost svg { width: 1.3rem; height: 1.3rem; stroke-width: 1.6; }
 
 /* ------------------------------------------------------------------
-   About (G)
+   The game popup: a phone-shaped window that plays the puzzle games in place
 ------------------------------------------------------------------ */
-.about { max-width: 76rem; margin: 0 auto; }
-.about__body p { margin: 0 0 1.4em; max-width: 62ch; text-wrap: pretty; }
-.about__tbd { font-family: var(--display); font-size: clamp(2rem, 4vw, 3rem); color: var(--vellum-soft); }
+html:has(dialog[open]) { overflow: hidden; }
+
+.game {
+  /* the games' own proportions (420 x 740), as large as the screen allows */
+  height: min(52rem, 92svh);
+  width: min(calc(min(52rem, 92svh) * 420 / 740), calc(100vw - 8rem)); /* room beside it for the close button */
+  max-width: none; max-height: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vellum);
+  overflow: visible; /* the close button sits just outside the game */
+}
+.game[open] {
+  display: grid;
+  animation: game-in 0.5s var(--ease-out);
+}
+.game::backdrop { background: oklch(0.1 0.04 268 / 0.78); }
+@keyframes game-in {
+  from { opacity: 0; transform: translateY(1.5rem) scale(0.97); }
+}
+
+/* the only control: a small close button just outside the game's top corner, so it never covers the game */
+.game__close {
+  position: absolute; top: 0; right: -3.25rem; z-index: 1;
+  display: grid; place-items: center;
+  width: 2.5rem; height: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--night) 82%, transparent);
+  color: var(--gold);
+  box-shadow: 0 4px 14px -6px oklch(0.05 0.03 268 / 0.8);
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.game__close:hover { background: var(--gold); color: var(--ink-on-gold); }
+.game__close svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+/* the game is drawn phone-sized and scaled to fit (see games.ts), on the same pale ground as the games */
+.game__stage {
+  position: relative; overflow: hidden;
+  height: 100%;
+  border: 1px solid color-mix(in oklch, var(--gold) 45%, transparent);
+  border-radius: 20px;
+  background: oklch(0.975 0.004 260);
+  box-shadow: 0 40px 80px -30px oklch(0.05 0.03 268 / 0.95);
+}
+.game__frame { position: absolute; top: 0; left: 0; border: 0; background: oklch(0.975 0.004 260); transform-origin: 0 0; }
+
+@media (max-width: 600px) {
+  /* full screen, with a slim strip at the top that holds only the close button */
+  .game { padding-top: 3.5rem; background: var(--night); }
+  .game__stage { border: 0; border-radius: 0; }
+  .game__close { top: 0.5rem; right: 0.75rem; }
+  .game { width: 100vw; height: 100svh; border: 0; border-radius: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game[open] { animation: none; }
+}
+
+/* About me: its layout and the bookshelf live in components/about/ */
 
 /* ------------------------------------------------------------------
-   Puzzle
+   Puzzle: a decoding machine, scrambled in on the left, decoded out on the right
 ------------------------------------------------------------------ */
-.wards {
-  max-width: 76rem; margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(3rem, 6vw, 6rem);
-}
-.wards__text > p:not(.lede) { max-width: 46ch; color: var(--vellum-soft); margin: 0 0 2rem; }
+.wards { max-width: 76rem; margin: 0 auto; }
+.wards__head { text-align: center; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+.wards__head .heading { margin-bottom: 1rem; }
+.wards__head .lede { margin: 0 auto; max-width: 52ch; text-wrap: balance; }
 
-.message {
-  padding: 1.5rem 0 0;
-  border-top: 1px solid color-mix(in oklch, var(--gold) 30%, transparent);
+.wards__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
 }
-.message p { margin: 0; font-family: var(--caps); font-weight: 500; letter-spacing: 0.08em; line-height: 1.35; }
-.message__cipher { font-size: 1rem; color: var(--vermilion); margin-bottom: 0.6rem !important; }
+.wards__side { position: relative; padding: 1.5rem 0; border-block: 1px solid color-mix(in oklch, var(--gold) 30%, transparent); }
+.wards__side--in { text-align: right; }
+.wards__side--out { text-align: left; }
+/* a small gold arrow on each side pointing the way the message travels: in, through the wheel, out */
+.wards__side::after {
+  content: "";
+  position: absolute; top: 50%;
+  width: 0.6rem; height: 0.6rem;
+  border-top: 1.5px solid var(--gold); border-right: 1.5px solid var(--gold);
+  transform: translateY(-50%) rotate(45deg);
+}
+.wards__side--in::after { right: -1.4rem; }
+.wards__side--out::after { left: -1.4rem; }
+.wards__label { margin: 0 0 0.6rem; font-family: var(--caps); font-weight: 700; font-size: 1rem; color: var(--vellum-soft); }
+
+.message__cipher, .message__plain { margin: 0; font-family: var(--caps); font-weight: 500; letter-spacing: 0.08em; line-height: 1.35; }
+.message__cipher { font-size: clamp(1.15rem, 1vw + 0.8rem, 1.5rem); color: var(--vermilion); }
 .message__plain {
-  font-size: clamp(1.4rem, 2vw + 0.8rem, 2.1rem);
+  font-size: clamp(1.15rem, 1vw + 0.8rem, 1.5rem);
   color: var(--vellum-soft);
-  min-height: 2.7em;
   transition: color 0.6s var(--ease-out);
 }
 .message.is-solved .message__plain { color: var(--gold); }
 
 .wheel { display: grid; justify-items: center; gap: 1.25rem; }
 .wheel__svg {
-  width: min(100%, 30rem);
+  /* as big as it can be while the whole puzzle (title, wheel, controls) still fits on one screen */
+  width: min(100%, 30rem, calc(100svh - 24rem));
+  min-width: 15rem;
   height: auto;
   cursor: grab;
   touch-action: none;
@@ -590,12 +706,12 @@ main { position: relative; }
 }
 .wheel__svg:active { cursor: grabbing; }
 .wheel__svg:focus-visible { outline-offset: 8px; border-radius: 50%; }
-.wheel__svg .ring-outer { fill: var(--lapis); stroke: var(--gold-deep); stroke-width: 1.5; }
-.wheel__svg .ring-inner { fill: var(--varnish); stroke: var(--gold-deep); stroke-width: 1.5; }
-.wheel__svg .ring-hub   { fill: var(--night); stroke: var(--gold-deep); stroke-width: 1.5; }
-.wheel__svg .tick { stroke: color-mix(in oklch, var(--gold) 40%, transparent); stroke-width: 1; }
-.wheel__svg .glyph-outer { fill: var(--vellum); font-family: var(--caps); font-weight: 700; font-size: 19px; }
-.wheel__svg .glyph-inner { fill: var(--gold); font-family: var(--caps); font-weight: 500; font-size: 17px; }
+.wheel__svg .ring-outer { fill: oklch(0.8 0.1 82); stroke: oklch(0.58 0.09 66); stroke-width: 2; }
+.wheel__svg .ring-inner { fill: oklch(0.92 0.03 88); stroke: oklch(0.58 0.09 66); stroke-width: 1.5; }
+.wheel__svg .ring-hub   { fill: var(--night); stroke: oklch(0.58 0.09 66); stroke-width: 2; }
+.wheel__svg .tick { stroke: oklch(0.45 0.08 62 / 0.4); stroke-width: 1; }
+.wheel__svg .glyph-outer { fill: var(--ink-on-gold); font-family: var(--caps); font-weight: 700; font-size: 19px; }
+.wheel__svg .glyph-inner { fill: var(--lapis); font-family: var(--caps); font-weight: 500; font-size: 17px; }
 .wheel__svg .pointer { fill: var(--vermilion); }
 .wheel__svg .inner { transition: transform 0.7s var(--ease-out); }
 .wheel__svg.is-dragging .inner { transition: none; }
@@ -634,8 +750,8 @@ main { position: relative; }
   margin: 0 0 1.5rem;
   font-family: var(--display);
   font-weight: 400;
-  font-size: clamp(3.4rem, 10vw, 8.5rem);
-  line-height: 1;
+  font-size: clamp(2.8rem, 6vw, 5rem); /* the same size as the other section headings */
+  line-height: 1.05;
   color: var(--ink-on-gold);
 }
 .raven__line { margin: 0 0 2.5rem; max-width: 34ch; font-size: clamp(1.3rem, 1vw + 1rem, 1.7rem); font-style: italic; }
@@ -691,11 +807,15 @@ main { position: relative; }
   .bar__mark { opacity: 1; transform: none; }
 
   .project, .project--flip { grid-template-columns: minmax(0, 1fr); }
+  .projects__head { grid-template-columns: minmax(0, 1fr); }
   .project--flip .project__text { order: 0; }
   .shot, .project--flip .shot { transform: none; }
 
-  .wards { grid-template-columns: minmax(0, 1fr); }
-  .wheel { order: -1; }
+  .wards__stage { grid-template-columns: minmax(0, 1fr); }
+  .wards__stage .wheel { order: -1; }
+  .wards__side, .wards__side--in, .wards__side--out { text-align: center; }
+  .wards__side::after { display: none; }
+  .wards__side--in { border-bottom: 0; }
 }
 
 @media (max-width: 600px) {

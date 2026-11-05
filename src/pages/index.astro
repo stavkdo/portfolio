@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import TopBar from "../components/TopBar.astro";
 import Hero from "../components/Hero.astro";
 import Projects from "../components/Projects.astro";
-import About from "../components/About.astro";
+import AboutGround from "../components/about/AboutGround.astro";
 import Puzzle from "../components/Puzzle.astro";
 import Contact from "../components/Contact.astro";
 ---
@@ -11,10 +11,12 @@ import Contact from "../components/Contact.astro";
 <Base>
   <TopBar />
   <main id="top">
-    <Hero />
-    <About />
-    <Projects />
-    <Puzzle />
+    <div class="sky">
+      <Hero />
+      <AboutGround />
+      <Projects />
+      <Puzzle />
+    </div>
     <Contact />
   </main>
 </Base>

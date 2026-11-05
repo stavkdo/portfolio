@@ -21,4 +21,4 @@ const sectionObserver = new IntersectionObserver(
   },
   { rootMargin: "-45% 0px -50% 0px" },
 );
-document.querySelectorAll("main > section[id]").forEach((s) => sectionObserver.observe(s));
+document.querySelectorAll("main section[id]").forEach((s) => sectionObserver.observe(s));

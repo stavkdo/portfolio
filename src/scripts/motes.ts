@@ -35,9 +35,19 @@ if (canvas && g && !reduceMotion) {
     if (visible) requestAnimationFrame(frame);
   });
 
+  // the stars fade as the sky turns from night to day
+  let daylight = 0;
+  const measure = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    daylight = max > 0 ? Math.min(1, scrollY / max) : 0;
+  };
+  addEventListener("scroll", measure, { passive: true });
+  measure();
+
   function frame(t: number) {
     if (!visible || !g) return;
     g.clearRect(0, 0, w, h);
+    const night = 1 - daylight * 0.8;
     for (const m of motes) {
       m.x += m.vx + Math.sin(t / 3000 + m.p) * 0.08;
       m.y += m.vy;
@@ -47,7 +57,7 @@ if (canvas && g && !reduceMotion) {
       }
       if (m.x < -10) m.x = w + 10;
       if (m.x > w + 10) m.x = -10;
-      const a = 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t / 900 + m.p * 3));
+      const a = (0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t / 900 + m.p * 3))) * night;
       const grd = g.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 3.5);
       grd.addColorStop(0, `rgba(240, 214, 140, ${a})`);
       grd.addColorStop(1, "rgba(240, 214, 140, 0)");
