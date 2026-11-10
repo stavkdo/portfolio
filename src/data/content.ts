@@ -134,19 +134,19 @@ export const projects: Project[] = [
     title: "Puzzle Games",
     area: "Web · Games",
     summary:
-      "Two daily style logic puzzles, Einstein's Zebra riddle and Lights Out, built from scratch with plain HTML, CSS and JavaScript, and illustrated with my own drawings.",
+      "Two daily style logic puzzles, Einstein's Zebra riddle and Lights Out, built from scratch with plain HTML, CSS and JavaScript, and illustrated with my own drawings. Each one fits on a single screen and plays with touch, mouse or keyboard.",
     tech: ["HTML", "CSS", "JavaScript", "SVG"],
     repo: "https://github.com/stavkdo/puzzle-games",
     demo: "https://zebra-puzzle.vercel.app",
     play: [
-      { label: "Zebra", src: "https://zebra-puzzle.vercel.app/game_one.html" },
+      { label: "Find the Zebra", src: "https://zebra-puzzle.vercel.app/game_one.html" },
       { label: "Lights Out", src: "https://zebra-puzzle.vercel.app/game_two.html" },
     ],
     visual: {
       kind: "phones",
       shots: [
-        { src: "/projects/puzzle-games.jpg", alt: "The Zebra puzzle: four houses, characters and pets, with clues below" },
-        { src: "/projects/puzzle-games-2.jpg", alt: "Lights Out: a three-by-three grid of light bulbs" },
+        { src: "/projects/puzzle-zebra.jpg", alt: "Find the Zebra: a board of four houses with rows for house colour, resident and pet, the eight clues below, and the four characters to guess from" },
+        { src: "/projects/puzzle-lights-out.jpg", alt: "Lights Out: an easy three-by-three grid of bulbs, three of them lit, with a timer, a move counter and four difficulty levels" },
       ],
     },
   },
