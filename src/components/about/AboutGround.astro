@@ -51,4 +51,9 @@ import Shelf from "./Shelf.astro";
     .ab2__text { padding-bottom: 0.5rem; }
     .ab2 :global(.ab2__books) { justify-self: center; }
   }
+  /* on a phone the shelf would take a whole screen of its own, so About me is just the text */
+  @media (max-width: 600px) {
+    .ab2 :global(.ab2__books), .ab2__plank { display: none; }
+    .ab2__text { padding-bottom: 0; }
+  }
 </style>

@@ -40,20 +40,36 @@ function layout() {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.innerHTML = "";
 
+  /*
+    On a phone there is no room for the whole length of the strings beside the text, so the
+    phone gets a close-up instead: the last stretch of the strings, the end of the fingerboard
+    and the bridge, centred in the space the CSS keeps free under the text.
+  */
   const narrow = W < 600;
-  const cx = W * (narrow ? 0.76 : 0.72);
-  const nutGap = narrow ? 8 : 13;
-  const bridgeGap = Math.max(narrow ? 19 : 40, Math.min(W * 0.072, 108));
-  const top = -10;
-  const bottom = H * (narrow ? 0.8 : 0.76);
+  const bridgeGap = narrow
+    ? Math.min(48, Math.max(34, W * 0.1))
+    : Math.max(40, Math.min(W * 0.072, 108));
+  const nutGap = narrow ? bridgeGap * 0.68 : 13;
+  const bw = bridgeGap * 3 + (narrow ? 40 : 84); // the bridge's width
+  const bh = narrow ? Math.min(84, bw * 0.5) : Math.min(120, H * 0.13); // and height
+  const cx = narrow ? W / 2 : W * 0.72;
+  let top = -10;
+  let bottom = H * 0.76;
+  if (narrow) {
+    const text = hero.querySelector<HTMLElement>(".hero__text")!;
+    const textBottom = text.getBoundingClientRect().bottom - hero.getBoundingClientRect().top;
+    bottom = H - bh - 84; // clear of the top bar when you scroll on to About me
+    top = Math.min(textBottom + 16, bottom - 150);
+  }
   const spread = (y: number) => nutGap + (bridgeGap - nutGap) * ((y - top) / (bottom - top));
 
   const defs = el("defs", {}, svg);
-  // strings fade in below the top bar so they never cross its text
-  const fadeFrom = Math.min(0.2, 64 / bottom).toFixed(3);
-  const fadeTo = Math.min(0.32, 190 / bottom).toFixed(3);
+  // strings fade in from nothing at their top end: below the top bar on a big screen, below the text on a phone
+  const fadeFrom = narrow ? "0" : Math.min(0.2, 64 / bottom).toFixed(3);
+  const fadeTo = narrow ? "0.3" : Math.min(0.32, 190 / bottom).toFixed(3);
+  const gy1 = narrow ? top : 0;
   const sheen = el("linearGradient", {
-    id: "string-sheen", gradientUnits: "userSpaceOnUse", x1: 0, y1: 0, x2: 0, y2: bottom,
+    id: "string-sheen", gradientUnits: "userSpaceOnUse", x1: 0, y1: gy1, x2: 0, y2: bottom,
   }, defs);
   el("stop", { offset: "0", "stop-color": "oklch(0.84 0.12 84)", "stop-opacity": "0" }, sheen);
   el("stop", { offset: fadeFrom, "stop-color": "oklch(0.84 0.12 84)", "stop-opacity": "0" }, sheen);
@@ -65,7 +81,7 @@ function layout() {
   el("stop", { offset: "1", "stop-color": "oklch(0.70 0.09 64)" }, maple);
 
   const ebony = el("linearGradient", {
-    id: "ebony", gradientUnits: "userSpaceOnUse", x1: 0, y1: 0, x2: 0, y2: bottom,
+    id: "ebony", gradientUnits: "userSpaceOnUse", x1: 0, y1: gy1, x2: 0, y2: bottom,
   }, defs);
   el("stop", { offset: "0", "stop-color": "oklch(0.13 0.035 268)", "stop-opacity": "0" }, ebony);
   el("stop", { offset: fadeFrom, "stop-color": "oklch(0.13 0.035 268)", "stop-opacity": "0" }, ebony);
@@ -73,8 +89,8 @@ function layout() {
   el("stop", { offset: "1", "stop-color": "oklch(0.15 0.035 268)", "stop-opacity": "1" }, ebony);
 
   // Fingerboard: tapered ebony, ending well above the bridge
-  const fbEnd = top + (bottom - top) * 0.66;
-  const pad = narrow ? 9 : 16;
+  const fbEnd = top + (bottom - top) * (narrow ? 0.5 : 0.66);
+  const pad = narrow ? 8 : 16;
   const wTop = spread(top) * 1.5 + pad;
   const wEnd = spread(fbEnd) * 1.5 + pad;
   el("path", {
@@ -84,8 +100,6 @@ function layout() {
   }, svg);
 
   // Bridge: carved maple with feet, waist, kidney eyes and a heart
-  const bw = bridgeGap * 3 + (narrow ? 44 : 84);
-  const bh = Math.min(narrow ? 84 : 120, H * 0.13);
   const L = cx - bw / 2, R = cx + bw / 2, T = bottom - 4, B = bottom - 4 + bh;
   el("path", {
     d: `M${L + bw * 0.1} ${B}

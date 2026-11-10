@@ -819,11 +819,12 @@ html:has(dialog[open]) { overflow: hidden; }
 }
 
 @media (max-width: 600px) {
-  .hero { align-items: start; padding-top: 6.5rem; }
-  .hero__name { font-size: 2.9rem; }
+  /* the text takes the full width; the space kept free under it holds a close-up of the strings and bridge (see strings.ts) */
+  .hero { align-items: start; padding-top: 6.5rem; padding-bottom: clamp(19rem, 44svh, 23rem); }
+  .hero__name { font-size: 3.1rem; }
   .hero__name span + span { padding-left: 0; }
-  .hero__line { max-width: 15ch; }
-  .hero__hint { max-width: 12rem; }
+  .hero__line { max-width: 24ch; }
+  .hero__hint { max-width: 22rem; }
 
   /* the flow turns vertical: the string hangs down the left */
   .flow ol { grid-auto-flow: row; gap: 1.4rem; }
