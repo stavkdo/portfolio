@@ -43,7 +43,7 @@ const github =
             <p class="project__summary">{p.summary}</p>
             {p.credit && <p class="project__credit">{p.credit}</p>}
             <p class="project__tech"><span class="sr">Built with: </span>{p.tech.join(" · ")}</p>
-            <p class="project__links">
+            {(p.play || p.demo || p.repo) && <p class="project__links">
               {p.play?.map((g) => (
                 <a class="button button--small" href={g.src} target="_blank" rel="noopener" data-play data-label={g.label}>
                   Play {g.label}
@@ -56,18 +56,26 @@ const github =
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg>
                 </a>
               )}
-              <a class="link-code" href={p.repo} target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={github}></path></svg>
-                View the code
-              </a>
-            </p>
+              {p.repo && (
+                <a class="link-code" href={p.repo} target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={github}></path></svg>
+                  View the code
+                </a>
+              )}
+            </p>}
           </div>
 
           <div class="project__visual reveal">
             {p.visual.kind === "image" && (
-              <a class="shot" href={p.demo ?? p.repo} target="_blank" rel="noopener" tabindex="-1">
-                <img src={p.visual.src} alt={p.visual.alt} loading="lazy" decoding="async" width={p.visual.width} height={p.visual.height} />
-              </a>
+              (p.demo ?? p.repo) ? (
+                <a class="shot" href={p.demo ?? p.repo} target="_blank" rel="noopener" tabindex="-1">
+                  <img src={p.visual.src} alt={p.visual.alt} loading="lazy" decoding="async" width={p.visual.width} height={p.visual.height} />
+                </a>
+              ) : (
+                <div class="shot">
+                  <img src={p.visual.src} alt={p.visual.alt} loading="lazy" decoding="async" width={p.visual.width} height={p.visual.height} />
+                </div>
+              )
             )}
             {p.visual.kind === "phones" && (
               <div class="phones">

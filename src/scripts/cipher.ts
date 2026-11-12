@@ -37,14 +37,16 @@ function ring(parent: Element, radius: number, inner: number, outer: number, cls
   });
 }
 
-el("circle", { class: "ring-outer", r: 196 }, svg);
-ring(el("g", {}, svg), 172, 150, 196, "glyph-outer", false);
-// pointer marking the reading position
-el("path", { class: "pointer", d: "M0 -199 l-7 -0.5 l7 12 l7 -12z" }, svg);
+// the outer ring is the one you turn; the inner ring stays put
+const outerRing = el("g", { class: "outer" }, svg);
+el("circle", { class: "ring-outer", r: 196 }, outerRing);
+ring(outerRing, 172, 150, 196, "glyph-outer", false);
 
 const innerRing = el("g", { class: "inner" }, svg);
 el("circle", { class: "ring-inner", r: 150 }, innerRing);
 ring(innerRing, 128, 106, 150, "glyph-inner", true);
+// pointer marking the reading position (drawn last so the turning ring never covers it)
+el("path", { class: "pointer", d: "M0 -199 l-7 -0.5 l7 12 l7 -12z" }, svg);
 
 el("circle", { class: "ring-hub", r: 106 }, svg);
 // an eight-pointed compass star at the hub
@@ -56,13 +58,13 @@ for (let k = 0; k < 16; k++) {
 el("path", { class: "hub-star", d: `M${star.join(" L")}Z` }, svg);
 el("circle", { r: 5, fill: "oklch(0.84 0.12 84)" }, svg);
 
-// Inner letter (P + s) sits under outer letter P when the ring is turned by s steps
-let rot = 0; // continuous rotation in degrees
+// Turning the outer ring clockwise by s steps puts inner letter (P + s) under outer letter P
+let rot = 0; // continuous rotation of the outer ring, in degrees (clockwise)
 let shift = 0;
 
 function render(animated = true) {
-  innerRing.style.transition = animated ? "" : "none";
-  innerRing.style.transform = `rotate(${-rot}deg)`;
+  outerRing.style.transition = animated ? "" : "none";
+  outerRing.style.transform = `rotate(${rot}deg)`;
   shift = ((Math.round(rot / STEP) % 26) + 26) % 26;
   svg.setAttribute("aria-valuenow", String(shift));
   svg.setAttribute("aria-valuetext", `Offset ${shift}`);
@@ -94,7 +96,7 @@ svg.addEventListener("pointermove", (e) => {
   if (d > 180) d -= 360;
   if (d < -180) d += 360;
   lastAngle = a;
-  rot -= d; // dragging clockwise turns the ring clockwise
+  rot += d; // the ring follows the finger: dragging clockwise turns it clockwise
   render(false);
 });
 

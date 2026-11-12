@@ -12,14 +12,20 @@ const { secret = "THANKS FOR STOPPING BY", cipherKey = 9 } = Astro.props;
   <div class="wards">
     <header class="wards__head">
       <h2 class="heading reveal" id="puzzle-title">One last puzzle</h2>
-      <p class="lede reveal">A message was locked with this wheel. Turn the inner ring until it makes sense.</p>
+      <p class="lede reveal">A message was locked with this wheel. Turn the outer ring until it makes sense.</p>
     </header>
 
-    <!-- a decoding machine: the ciphertext goes in on the left, comes out as plaintext on the right -->
+    <!-- a decoding machine: the locked message and what it reads as now sit above the wheel -->
     <div class="message wards__stage" data-secret={secret} data-key={cipherKey}>
-      <div class="wards__side wards__side--in reveal">
-        <p class="wards__label">Ciphertext</p>
-        <p class="message__cipher" aria-label="Ciphertext"></p>
+      <div class="wards__texts">
+        <div class="wards__side wards__side--in reveal">
+          <p class="wards__label">Ciphertext</p>
+          <p class="message__cipher" aria-label="Ciphertext"></p>
+        </div>
+        <div class="wards__side wards__side--out reveal">
+          <p class="wards__label">Plaintext</p>
+          <p class="message__plain" aria-live="polite"></p>
+        </div>
       </div>
 
       <div class="wheel reveal">
@@ -28,7 +34,7 @@ const { secret = "THANKS FOR STOPPING BY", cipherKey = 9 } = Astro.props;
           viewBox="-200 -200 400 400"
           role="slider"
           tabindex="0"
-          aria-label="Inner ring"
+          aria-label="Outer ring"
           aria-valuemin="0"
           aria-valuemax="25"
           aria-valuenow="0"
@@ -43,11 +49,6 @@ const { secret = "THANKS FOR STOPPING BY", cipherKey = 9 } = Astro.props;
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
           </button>
         </div>
-      </div>
-
-      <div class="wards__side wards__side--out reveal">
-        <p class="wards__label">Plaintext</p>
-        <p class="message__plain" aria-live="polite"></p>
       </div>
     </div>
   </div>

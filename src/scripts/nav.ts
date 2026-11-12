@@ -4,10 +4,18 @@ const bar = document.querySelector<HTMLElement>(".bar");
 const hero = document.querySelector<HTMLElement>(".hero");
 
 if (bar && hero) {
+  // Big screens: the bar stays clear over the hero and turns solid once the hero has gone.
+  // Phones: the hero text sits right under the bar, so the bar turns solid the moment the page
+  // scrolls; otherwise the name in the bar would slide over the hero's text.
+  const phone = window.matchMedia("(max-width: 600px)");
+  let heroGone = false;
+  const update = () => bar.classList.toggle("is-solid", heroGone || (phone.matches && window.scrollY > 4));
   new IntersectionObserver(
-    ([entry]) => bar.classList.toggle("is-solid", !entry.isIntersecting),
+    ([entry]) => { heroGone = !entry.isIntersecting; update(); },
     { rootMargin: "-72px 0px 0px 0px" },
   ).observe(hero);
+  window.addEventListener("scroll", update, { passive: true });
+  phone.addEventListener("change", update);
 }
 
 const navLinks = [...document.querySelectorAll<HTMLAnchorElement>(".bar__nav a")];

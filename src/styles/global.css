@@ -685,23 +685,25 @@ html:has(dialog[open]) { overflow: hidden; }
 
 .wards__stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(1.5rem, 3vw, 3rem);
+  justify-items: center;
+  gap: clamp(1.5rem, 3vh, 2.25rem);
 }
-.wards__side { position: relative; padding: 1.5rem 0; border-block: 1px solid color-mix(in oklch, var(--gold) 30%, transparent); }
-.wards__side--in { text-align: right; }
-.wards__side--out { text-align: left; }
-/* a small gold arrow on each side pointing the way the message travels: in, through the wheel, out */
-.wards__side::after {
+/* the locked message and what it reads as now, side by side above the wheel */
+.wards__texts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  width: min(100%, 56rem);
+}
+.wards__side { position: relative; padding: 1.1rem 0; border-block: 1px solid color-mix(in oklch, var(--gold) 30%, transparent); text-align: center; }
+/* a small gold arrow between them: the message goes in on the left and comes out on the right */
+.wards__side--in::after {
   content: "";
-  position: absolute; top: 50%;
+  position: absolute; top: 50%; right: calc(clamp(2rem, 5vw, 4rem) / -2 - 0.3rem);
   width: 0.6rem; height: 0.6rem;
   border-top: 1.5px solid var(--gold); border-right: 1.5px solid var(--gold);
   transform: translateY(-50%) rotate(45deg);
 }
-.wards__side--in::after { right: -1.4rem; }
-.wards__side--out::after { left: -1.4rem; }
 .wards__label { margin: 0 0 0.6rem; font-family: var(--caps); font-weight: 700; font-size: 1rem; color: var(--vellum-soft); }
 
 .message__cipher, .message__plain { margin: 0; font-family: var(--caps); font-weight: 500; letter-spacing: 0.08em; line-height: 1.35; }
@@ -716,12 +718,12 @@ html:has(dialog[open]) { overflow: hidden; }
 .wheel { display: grid; justify-items: center; gap: 1.25rem; }
 .wheel__svg {
   /* as big as it can be while the whole puzzle (title, wheel, controls) still fits on one screen */
-  width: min(100%, 30rem, calc(100svh - 24rem));
-  min-width: 15rem;
+  width: min(100%, 22rem, calc(100svh - 30rem));
+  min-width: 14rem;
   height: auto;
   cursor: grab;
-  /* a finger moving up or down scrolls the page as usual; moving sideways turns the ring */
-  touch-action: pan-y;
+  /* a finger on the wheel only turns the ring: the page doesn't scroll under it */
+  touch-action: none;
   user-select: none;
   border-radius: 50%;
 }
@@ -734,8 +736,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .wheel__svg .glyph-outer { fill: var(--ink-on-gold); font-family: var(--caps); font-weight: 700; font-size: 19px; }
 .wheel__svg .glyph-inner { fill: var(--lapis); font-family: var(--caps); font-weight: 500; font-size: 17px; }
 .wheel__svg .pointer { fill: var(--vermilion); }
-.wheel__svg .inner { transition: transform 0.7s var(--ease-out); }
-.wheel__svg.is-dragging .inner { transition: none; }
+.wheel__svg .outer { transition: transform 0.7s var(--ease-out); }
+.wheel__svg.is-dragging .outer { transition: none; }
 .wheel__svg .hub-star { fill: none; stroke: var(--gold); stroke-width: 1.4; stroke-linejoin: round; transition: transform 1.2s var(--ease-out); transform-origin: 0 0; }
 .wheel.is-solved .hub-star { transform: rotate(45deg) scale(1.08); fill: color-mix(in oklch, var(--gold) 25%, transparent); }
 
@@ -836,11 +838,11 @@ html:has(dialog[open]) { overflow: hidden; }
   .project--flip .project__text { order: 0; }
   .shot, .project--flip .shot { transform: none; }
 
-  .wards__stage { grid-template-columns: minmax(0, 1fr); }
-  .wards__stage .wheel { order: -1; }
-  .wards__side, .wards__side--in, .wards__side--out { text-align: center; }
-  .wards__side::after { display: none; }
+  /* the two texts stack, one above the other, and the wheel is smaller */
+  .wards__texts { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .wards__side--in { border-bottom: 0; }
+  .wards__side--in::after { display: none; }
+  .wheel__svg { width: min(64vw, 15rem); min-width: 0; }
 }
 
 @media (max-width: 600px) {
@@ -853,6 +855,9 @@ html:has(dialog[open]) { overflow: hidden; }
   .hero__actions { max-width: 54%; flex-direction: column; align-items: start; gap: 1rem; margin-top: 1.75rem; }
   .hero__hint { max-width: none; }
   .hero__actions .button { white-space: nowrap; }
+  /* the bar covers the hero text as it scrolls under it: fully opaque, and quick to appear */
+  .bar { transition-duration: 0.2s; }
+  .bar.is-solid { background: var(--night); }
 
   /* the play buttons get a smaller size and share one row; the code link goes on its own line under them */
   .project__links { gap: 0.6rem; }

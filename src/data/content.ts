@@ -20,7 +20,8 @@ export type Project = {
   area: string;
   summary: string;
   tech: string[];
-  repo: string;
+  /** the code on GitHub; leave out while a project isn't ready to show */
+  repo?: string;
   demo?: string;
   /** Games that open in a popup on this page instead of leaving the site */
   play?: { label: string; src: string }[];
@@ -104,8 +105,7 @@ export const projects: Project[] = [
     summary:
       "A home for a vinyl collection. Search records from Discogs or add them by hand, browse by album or artist, and let it pick something to play.",
     tech: ["React", "TypeScript", "Python", "PostgreSQL"],
-    repo: "https://github.com/stavkdo/record-library",
-    demo: "https://record-library.vercel.app",
+    // no links yet: the project isn't live, so there's no demo or code to point to
     visual: {
       kind: "image",
       src: "/projects/record-library.jpg",
