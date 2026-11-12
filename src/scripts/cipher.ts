@@ -60,6 +60,7 @@ el("circle", { r: 5, fill: "oklch(0.84 0.12 84)" }, svg);
 
 // Turning the outer ring clockwise by s steps puts inner letter (P + s) under outer letter P
 let rot = 0; // continuous rotation of the outer ring, in degrees (clockwise)
+const DRAG = 0.6; // how far the ring turns for each degree the finger or mouse moves around the wheel
 let shift = 0;
 
 function render(animated = true) {
@@ -96,7 +97,8 @@ svg.addEventListener("pointermove", (e) => {
   if (d > 180) d -= 360;
   if (d < -180) d += 360;
   lastAngle = a;
-  rot += d; // the ring follows the finger: dragging clockwise turns it clockwise
+  // dragging clockwise turns the ring clockwise, a little slower than the finger so it's easy to stop on a letter
+  rot += d * DRAG;
   render(false);
 });
 
