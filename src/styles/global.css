@@ -875,6 +875,17 @@ html:has(dialog[open]) { overflow: hidden; }
   :root { --sunrise: clamp(6rem, 15svh, 8rem); }
   #contact { padding-top: 3rem; }
 
+  /* the whole puzzle fits on one screen under the bar: a one-line title, tighter gaps,
+     the two texts closer together, and a wheel that gives way a little on short screens */
+  #puzzle { padding-top: 1.5rem; }
+  #puzzle .heading { font-size: min(2.6rem, 9.5vw); margin-bottom: 0.75rem; }
+  .wards__head { margin-bottom: 1.25rem; }
+  .wards__stage { gap: 1.25rem; }
+  .wards__side { padding: 0.5rem 0; }
+  .wards__label { margin-bottom: 0.1rem; font-size: 0.85rem; }
+  .wheel { gap: 1rem; }
+  .wheel__svg { width: clamp(13rem, 100svh - 27.5rem, min(64vw, 15rem)); }
+
   /* the flow turns vertical: the string hangs down the left */
   .flow ol { grid-auto-flow: row; gap: 1.4rem; }
   .flow { min-height: 0; }
