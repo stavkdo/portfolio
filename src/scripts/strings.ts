@@ -25,7 +25,7 @@ const svg = hero.querySelector<SVGSVGElement>(".strings__svg")!;
 
 if (window.matchMedia("(pointer: coarse)").matches) {
   const hint = hero.querySelector(".hero__hint-text");
-  if (hint) hint.textContent = "Swipe across the strings to play them. Tap one to jump to its section.";
+  if (hint) hint.textContent = "Tap or swipe across the strings to play them.";
 }
 
 const strings: CelloString[] = NOTES.map((freq, i) => ({
@@ -40,33 +40,44 @@ function layout() {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.innerHTML = "";
 
-  /*
-    On a phone there is no room for the whole length of the strings beside the text, so the
-    phone gets a close-up instead: the last stretch of the strings, the end of the fingerboard
-    and the bridge, centred in the space the CSS keeps free under the text.
-  */
   const narrow = W < 600;
-  const bridgeGap = narrow
-    ? Math.min(48, Math.max(34, W * 0.1))
-    : Math.max(40, Math.min(W * 0.072, 108));
-  const nutGap = narrow ? bridgeGap * 0.68 : 13;
-  const bw = bridgeGap * 3 + (narrow ? 40 : 84); // the bridge's width
-  const bh = narrow ? Math.min(84, bw * 0.5) : Math.min(120, H * 0.13); // and height
-  const cx = narrow ? W / 2 : W * 0.72;
+  let bridgeGap = Math.max(40, Math.min(W * 0.072, 108));
+  let nutGap = 13;
+  let bw = bridgeGap * 3 + 84; // the bridge's width
+  let bh = Math.min(120, H * 0.13); // and height
+  let cx = W * 0.72;
   let top = -10;
   let bottom = H * 0.76;
+  let pad = 16; // how far the fingerboard reaches past the outer strings
   if (narrow) {
-    const text = hero.querySelector<HTMLElement>(".hero__text")!;
-    const textBottom = text.getBoundingClientRect().bottom - hero.getBoundingClientRect().top;
-    bottom = H - bh - 84; // clear of the top bar when you scroll on to About me
-    top = Math.min(textBottom + 16, bottom - 150);
+    /*
+      On a phone the cello stands beside the text, under the name: a smaller copy of the
+      big-screen cello with exactly its proportions (every measure below is a multiple of the
+      gap between the strings at the bridge, as on a 1440 x 900 screen), sized to fit the
+      column the CSS leaves free to the right of the text.
+    */
+    const box = hero.getBoundingClientRect();
+    const rel = (sel: string) => hero.querySelector<HTMLElement>(sel)!.getBoundingClientRect();
+    const nameBottom = rel(".hero__name").bottom - box.top;
+    const textBottom = rel(".hero__text").bottom - box.top;
+    const colLeft = rel(".hero__line").right - box.left + 10;
+    const colRight = W - Math.min(18, W * 0.045);
+    const room = textBottom - (nameBottom + 18);
+    bridgeGap = Math.max(18, Math.min((colRight - colLeft) / 3.81, room / 7.8));
+    nutGap = bridgeGap * 0.125;
+    bw = bridgeGap * 3.81;
+    bh = bridgeGap * 1.125;
+    cx = (colLeft + colRight) / 2;
+    bottom = textBottom - bh;
+    top = bottom - bridgeGap * 6.67;
+    pad = bridgeGap * 0.154;
   }
   const spread = (y: number) => nutGap + (bridgeGap - nutGap) * ((y - top) / (bottom - top));
 
   const defs = el("defs", {}, svg);
-  // strings fade in from nothing at their top end: below the top bar on a big screen, below the text on a phone
-  const fadeFrom = narrow ? "0" : Math.min(0.2, 64 / bottom).toFixed(3);
-  const fadeTo = narrow ? "0.3" : Math.min(0.32, 190 / bottom).toFixed(3);
+  // strings fade in from nothing at their top end: below the top bar on a big screen, below the name on a phone
+  const fadeFrom = narrow ? "0.05" : Math.min(0.2, 64 / bottom).toFixed(3);
+  const fadeTo = narrow ? "0.28" : Math.min(0.32, 190 / bottom).toFixed(3);
   const gy1 = narrow ? top : 0;
   const sheen = el("linearGradient", {
     id: "string-sheen", gradientUnits: "userSpaceOnUse", x1: 0, y1: gy1, x2: 0, y2: bottom,
@@ -89,8 +100,9 @@ function layout() {
   el("stop", { offset: "1", "stop-color": "oklch(0.15 0.035 268)", "stop-opacity": "1" }, ebony);
 
   // Fingerboard: tapered ebony, ending well above the bridge
-  const fbEnd = top + (bottom - top) * (narrow ? 0.5 : 0.66);
-  const pad = narrow ? 8 : 16;
+  const fbEnd = top + (bottom - top) * 0.66;
+  // thinner strings on the smaller phone cello, but never thinner than a hairline
+  const thin = narrow ? Math.max(0.55, bridgeGap / 70) : 1;
   const wTop = spread(top) * 1.5 + pad;
   const wEnd = spread(fbEnd) * 1.5 + pad;
   el("path", {
@@ -124,7 +136,7 @@ function layout() {
       fill: hole,
     }, svg);
   });
-  const hs = Math.max(0.6, bh / 110);
+  const hs = Math.max(narrow ? 0.3 : 0.6, bh / 110);
   el("path", {
     d: `M${cx} ${T + bh * 0.34}
         c${-7 * hs} ${-9 * hs} ${-16 * hs} ${-2 * hs} ${-9 * hs} ${6 * hs}
@@ -143,11 +155,11 @@ function layout() {
     s.y1 = T + bh * 0.16 - 2 * u * (1 - u) * bh * 0.3;
     s.glow = el("path", {
       fill: "none", stroke: "url(#string-sheen)", "stroke-opacity": "0",
-      "stroke-width": WIDTHS[i] * 3.5, "stroke-linecap": "round",
+      "stroke-width": WIDTHS[i] * thin * 3.5, "stroke-linecap": "round",
     }, svg);
     s.path = el("path", {
       fill: "none", stroke: "url(#string-sheen)",
-      "stroke-width": WIDTHS[i], "stroke-linecap": "round",
+      "stroke-width": WIDTHS[i] * thin, "stroke-linecap": "round",
     }, svg);
     draw(s);
   });
@@ -226,7 +238,7 @@ const stringAt = (x: number, y: number, tolerance: number) => {
   let best = -1;
   let bestDist = tolerance;
   strings.forEach((s, i) => {
-    if (y < 0 || y > s.y1) return;
+    if (y < s.y0 || y > s.y1) return; // only the drawn part of the string, never the empty sky above it
     const d = Math.abs(x - xAt(s, y));
     if (d < bestDist) {
       best = i;
@@ -256,6 +268,10 @@ hero.addEventListener("pointermove", (e) => {
   if (prev && p.y > 0 && p.y < strings[0].y1) {
     const from = prev;
     strings.forEach((s, i) => {
+      // a crossing counts only on the drawn string: on a phone the strings are short, and the
+      // line carried on upward would make the empty sky above them play
+      const midY = (from.y + p.y) / 2;
+      if (midY < s.y0 || midY > s.y1) return;
       const a = from.x - xAt(s, from.y);
       const b = p.x - xAt(s, p.y);
       if (a !== 0 && Math.sign(a) !== Math.sign(b)) {
@@ -269,7 +285,9 @@ hero.addEventListener("pointermove", (e) => {
 hero.addEventListener("pointerleave", () => {
   prev = null;
 });
-// A click (or tap) on a string plays it and travels to its section; a drag across the strings just plays them
+// A mouse click on a string plays it and travels to its section; a drag across the strings just plays them.
+// On a touch screen a tap only plays the string: people tap to play, and a jump to another section
+// (the A string's is Contact, at the very end) would yank the page away mid-tune.
 let down: { x: number; y: number; string: number } | null = null;
 
 hero.addEventListener("pointerdown", (e) => {
@@ -285,8 +303,13 @@ hero.addEventListener("pointerup", (e) => {
   if (!down || down.string < 0) return;
   const r = hero.getBoundingClientRect();
   const moved = Math.hypot(e.clientX - r.left - down.x, e.clientY - r.top - down.y);
-  if (moved < 8) goTo(down.string);
+  if (moved < 8 && e.pointerType === "mouse") goTo(down.string);
   down = null;
+});
+// the browser took the touch over to scroll the page: forget it, so it can't count as a tap later
+hero.addEventListener("pointercancel", () => {
+  down = null;
+  prev = null;
 });
 
 // The keyboard: press C, G, D or A to play that string and go to its section
@@ -307,10 +330,21 @@ document.querySelectorAll<HTMLAnchorElement>("a[data-string]").forEach((a) => {
   a.addEventListener("click", () => pluck(Number(a.dataset.string), 0.6, 0.55));
 });
 
+// Redraw only when the hero really changes size. Phones fire "resize" whenever the address bar
+// slides in or out during a scroll, and rebuilding the strings then would stutter the scroll.
 let resizeTimer: number | undefined;
+let laidOut = "";
+const relayout = () => {
+  const { width, height } = hero.getBoundingClientRect();
+  const key = `${Math.round(width)}x${Math.round(height)}`;
+  if (key === laidOut) return;
+  laidOut = key;
+  layout();
+};
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(layout, 120);
+  resizeTimer = window.setTimeout(relayout, 120);
 });
-layout();
-document.fonts?.ready.then(layout);
+relayout();
+// the fonts change where the text ends, which the phone cello is sized to
+document.fonts?.ready.then(() => { laidOut = ""; relayout(); });
